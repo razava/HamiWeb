@@ -1,0 +1,8 @@
+version: '3.8'
+services:
+  web:
+    image: ${DOCKER_REGISTRY:-docker.shetabdahi.ir/}oyoon-admin
+    restart: always
+    ports:
+      - "127.0.0.1:6679:6679"
+

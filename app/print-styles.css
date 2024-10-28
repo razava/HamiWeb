@@ -1,0 +1,13 @@
+/* styles/print-styles.css */
+
+@media print {
+
+    /* Add styles for the print window */
+    body {
+        font-size: larger;
+        color: red;
+        background-color: aquamarine;
+        padding: 2em;
+        /* Add any other print-specific styles */
+    }
+}
