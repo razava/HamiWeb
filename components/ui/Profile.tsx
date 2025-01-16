@@ -33,11 +33,14 @@ const FormSchema = z.object({
     message: "لطفا نام خانوادگی خود را وارد نمایید.",
   }),
   phoneNumber: z.string().trim().optional(), // اگر شماره تلفن باید بدون اسپیس باشد، از .trim() استفاده می‌کنیم
+  patientGroupName: z.string().trim().optional(),
+  mentorName: z.string().trim().optional(),
 });
-
 
 export default function Profile() {
   const router = useRouter();
+  const userRole = localStorage.getItem("Hami_Role");
+
   const [open, setOpen] = useState<boolean>(false);
   const [open2, setOpen2] = useState<boolean>(false);
   const {
@@ -46,7 +49,7 @@ export default function Profile() {
     refetch,
   } = useQuery({
     queryKey: ["Profile"],
-    queryFn: () => getProfile(),
+    queryFn: () => getProfile(userRole || ""),
     refetchOnWindowFocus: false,
   });
 
@@ -76,6 +79,8 @@ export default function Profile() {
       form.setValue("firstName", profileData.firstName);
       form.setValue("lastName", profileData.lastName);
       form.setValue("phoneNumber", profileData.phoneNumber);
+      form.setValue("patientGroupName", profileData.patientGroupName);
+      form.setValue("mentorName", profileData.mentorName);
     }
   }, [profileData]);
 
@@ -156,6 +161,47 @@ export default function Profile() {
                   </Button>
                 </div>{" "}
               </div>
+
+              {userRole === "Patient" && (
+                <>
+                  <h2 className=" w-full font-bold mt-5 mb-2">
+                    اطلاعات گروه درمانی
+                  </h2>
+                  <div className=" border p-4 flex max-lg:flex-col justify-between rounded-md items-center">
+                    <FormField
+                      control={form.control}
+                      name="patientGroupName"
+                      render={({ field }) => (
+                        <FormItem className="w-full sm:w-[48%]">
+                          <FormLabel className="text-[#7C838A]  text-sm font-medium mt-7">
+                            نام گروه
+                          </FormLabel>
+                          <FormControl>
+                            <Input type="text" {...field} readOnly />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={form.control}
+                      name="mentorName"
+                      render={({ field }) => (
+                        <FormItem className="w-full sm:w-[48%]">
+                          <FormLabel className="text-[#7C838A]  text-sm font-medium mt-7">
+                            منتور گروه
+                          </FormLabel>
+                          <FormControl>
+                            <Input type="text" {...field} readOnly />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                </>
+              )}
               <h2 className=" w-full font-bold mt-5 mb-2">اطلاعات ورود</h2>
               <div className=" border p-4 flex max-lg:flex-col justify-between rounded-md items-center">
                 <FormField
@@ -174,14 +220,14 @@ export default function Profile() {
                   )}
                 />
                 <div className="flex gap-2 max-md:justify-center max-md:mt-6 max-md:w-full">
-                  <Button
+                  {/* <Button
                     type="button"
                     disabled={editProfileMutation.isPending}
                     onClick={() => setOpen(true)}
                     className="max-sm:w-1/2 w-32 p-2 max-sm:text-xs text-white transition bg-blue hover:bg-blue/90  rounded-xl"
                   >
                     تغییر شماره موبایل
-                  </Button>
+                  </Button> */}
                   <Button
                     type="button"
                     disabled={editProfileMutation.isPending}

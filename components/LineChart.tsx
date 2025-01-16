@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 import {
   Chart as ChartJS,
@@ -10,18 +9,10 @@ import {
   Title,
   Tooltip,
   Legend,
-  ChartOptions,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
-import { faker } from "@faker-js/faker";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import jalaliday from "jalaliday";
-import { backgroundColor, borderColor } from "@/constants/colors";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-dayjs.extend(jalaliday);
-dayjs.extend(utc);
-ChartJS.defaults.font.family = "Yekan";
+
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -33,93 +24,70 @@ ChartJS.register(
   ChartDataLabels
 );
 
-// export const options = {
-//   responsive: true,
-//   plugins: {
-//     legend: {
-//       position: "top" as const,
-//     },
-//     title: {
-//       display: true,
-//       text: "Chart.js Line Chart",
-//     },
-//   },
-// };
+interface DataItem {
+  title: string; // تاریخ تست
+  value: string; // امتیاز تست
+  displayValue: string; // توضیح کیفی امتیاز
+}
 
-const labels = ["January", "February", "March", "April", "May", "June", "July"];
-
-export const data = {
-  labels,
-  datasets: [
-    {
-      label: "Dataset 1",
-      data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
-      borderColor: "rgb(255, 99, 132)",
-      backgroundColor: "rgba(255, 99, 132, 0.5)",
-    },
-    {
-      label: "Dataset 2",
-      data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
-      borderColor: "rgb(53, 162, 235)",
-      backgroundColor: "rgba(53, 162, 235, 0.5)",
-    },
-  ],
-};
-
-interface Values {
-  title: string;
-  value: string;
-  displayValue: string;
-  parameters: any;
+interface ChartData {
+  title: string; // عنوان سری (GAD یا MDD)
+  values: DataItem[]; // داده‌های سری
 }
 
 export default function LineChart({
   chartData,
   chartTitle,
 }: {
-  chartData: { title: string; icon: string; values: Values[] }[];
+  chartData: ChartData[];
   chartTitle: string;
 }) {
-  const options: ChartOptions<"line"> = {
+  const options = {
     responsive: true,
     maintainAspectRatio: false,
-    scales: { x: { ticks: { autoSkip: false } } },
+    scales: {
+      x: { ticks: { autoSkip: false } },
+    },
     plugins: {
       legend: {
-        position: "top" as const,
+        position: "top" as const, // موقعیت توضیحات نمودار
       },
       title: {
         display: true,
         text: chartTitle,
-        position: "bottom",
+        position: "bottom" as const, // موقعیت عنوان نمودار
       },
       datalabels: {
         display: true,
         color: "black",
-        align: "end",
-        anchor: "end",
-        font: { size: 12 },
-        formatter: function (value, context) {
-          return value == 0 ? "" : value;
+        align: "end" as const, // مقدار صحیح برای align
+        anchor: "end" as const, // مقدار صحیح برای anchor
+        font: { size: 10 },
+        formatter: function (value: number, context: any) {
+          const index = context.dataIndex;
+          const datasetIndex = context.datasetIndex;
+          const dataPoint = chartData[datasetIndex]?.values[index - 1]; // هماهنگ‌سازی با dummy label
+          return dataPoint?.displayValue || ""; // توضیحات کیفی را نشان می‌دهد
         },
       },
     },
   };
 
   const data = {
-    labels: chartData[0].values.map((item) => {
-      return item.title;
-    }),
-    datasets: chartData.map((item: any, index: number) => {
-      return {
-        label: item.title,
-        data: item.values.map((item: any) => item.value),
-        backgroundColor: backgroundColor[index],
-        borderColor: borderColor[index],
-        borderWidth: 1,
-      };
-    }),
+    labels: ["", ...chartData[0].values.map((item) => item.title)], // اضافه کردن dummy label
+    datasets: chartData.map((serie, index) => ({
+      label: serie.title, // عنوان سری (GAD یا MDD)
+      data: [null, ...serie.values.map((item) => parseInt(item.value))], // اضافه کردن فضای خالی برای هماهنگ‌سازی با dummy label
+      backgroundColor: `rgba(${index * 200}, 100, 200, 0.5)`, // رنگ خط
+      borderColor: `rgba(${index * 200}, 100, 200, 1)`, // رنگ حاشیه
+      borderWidth: 2,
+      tension: 0.4, // خطوط نرم بین نقاط
+    })),
   };
 
-  return <Line options={options} data={data} className="h-[20rem] " />;
+  return (
+    <div className="h-[25rem] w-full">
+      <Line options={options} data={data} />
+    </div>
+  );
 }

@@ -349,7 +349,7 @@ export default function InspectorOperations({
                       <FormLabel className="font-normal">
   خصوصی
   <span className="text-xs text-gray-500 ml-2">
-    (قابل مشاهده فقط توسط بازرس)
+    (قابل مشاهده فقط توسط کارشناس)
   </span>
 </FormLabel>
                     </FormItem>

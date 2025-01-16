@@ -10,10 +10,9 @@ export default function BoxDashboard({
   }) {
   
   const boxIcons = {
-    "گزارش ناشناس": <EyeOff className=" mb-2 mx-auto" />,
-    "گزارش شناس": <UserCheck className=" mb-2 mx-auto" />,
-    گزارش: <ClipboardList className=" mb-2 mx-auto" />,
-    کاربر: <User className=" mb-2 mx-auto" />,
+    "جلسات برگزار شده": <EyeOff className=" mb-2 mx-auto" />,
+    "گروه های عضو": <UserCheck className=" mb-2 mx-auto" />,
+    "کاربران جلسات": <ClipboardList className=" mb-2 mx-auto" />,
   };
 
   const checkIcon = boxIcons[title as keyof typeof boxIcons] ? (

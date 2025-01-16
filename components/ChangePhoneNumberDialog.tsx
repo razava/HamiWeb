@@ -59,11 +59,13 @@ export default function ChangePhoneNumberDialog({
       localStorage.setItem("ph_newToken", res.newToken);
       localStorage.setItem("ph_phoneNumber", res.phoneNumber);
       localStorage.setItem("ph_newPhoneNumber", res.newPhoneNumber);
-      const userRole = localStorage.getItem("userRole");
+      const userRole = localStorage.getItem("Hami_Role");
       if (userRole === "Admin") {
         router.push(`/UserPanel/AdminDashboard/ChangePhoneNumber`);
-      } else {
+      } else if (userRole == "Mentor"){
         router.push(`/UserPanel/ControllerDashboard/ChangePhoneNumber`);
+      } else{
+        router.push(`/UserPanel/PatientDashboard/ChangePhoneNumber`);
       }
     },
     onError: (err: any | string) => {

@@ -125,8 +125,9 @@ export async function changePassword(payload: {
   return data.data;
 }
 
-export async function getProfile() {
-  const data = await axios.get("api/Authenticate/Profile");
+export async function getProfile(mode?: string) {
+  const params = mode ? `?mode=${mode}` : "";
+  const data = await axios.get(`api/Authenticate/Profile${params}`);
   return data.data;
 }
 
@@ -140,6 +141,37 @@ export async function editProfile(payload: {
   const data = await axios.put("api/Authenticate/Profile", payload);
   return data.data;
 }
+
+export async function preRegisterPatient(payload: {
+  phoneNumber: string;
+  username: string; // شماره همراه به عنوان نام کاربری
+  password: string;
+  nationalId: string;
+  firstName: string;
+  lastName: string;
+  dateOfBirth: Date; // فرمت YYYY-MM-DD
+  gender: number; // 1 = Male, 2 = Female, 3 = Other
+  education: number; // 0 = None, 1 = HighSchool, ...
+  city: string;
+  organ: number; // 1 = Ovary, 2 = Breast, 3 = Prostate
+  diseaseType: number; // "Benign" یا "Malignant"
+  patientStatus: number; // 1 = NewlyDiagnosed, 2 = UnderTreatment, ...
+  stage?: number; // سطح بیماری (اختیاری)
+  pathologyDiagnosis?: string; // تشخیص پاتولوژی (اختیاری)
+  initialWeight?: number; // وزن اولیه (اختیاری)
+  sleepDuration?: number; // مدت خوابیدن (اختیاری)
+  appetiteLevel: number; // 1 = High, 2 = Normal, 3 = Low
+  gadScore: number; // امتیاز GAD
+  mddScore: number; // امتیاز MDD
+}) {
+  const data = await axios.post("/api/Authenticate/RegisterPatient", payload, {
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  return data.data;
+}
+
 
 export async function revoke(payload: {
   refreshToken: string | CookieValueTypes;

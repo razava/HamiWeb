@@ -1,4 +1,4 @@
-import ComplainsDetails from "@/components/ComplainsDetails";
+import ComplainsDetails from "@/components/PatientsDetails";
 import React from "react";
 
 export default function page({ params }: { params: any }) {

@@ -30,11 +30,17 @@ export default function Verify() {
           "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
         ];
       localStorage.setItem("Hami_Role", userRole);
-      if (userRole == "Inspector") {
+      if (userRole == "Mentor") {
         router.push("/UserPanel/ControllerDashboard");
       } else if (userRole == "Admin") {
         router.push("/UserPanel/AdminDashboard");
+      } else if (userRole == "Patient") {
+        //  if(localStorage.getItem("ShowPreRegister") === "yes")
+        //   router.push("/RegisterForm");
+        //  else
+          router.push("/UserPanel/PatientDashboard");
       } 
+      
     },
     onError: (err: any | string) => {
       toast(<>{err.response.data.detail}</>, {

@@ -12,6 +12,38 @@ export const menuItems = [
   { id: 6, name: "ورود به پنل کاربری", href: "/Login" },
 ];
 
+export const operatorMenuItems = [
+  { id: 1, name: "صفحه اصلی", href: "/" },
+  { id: 2, name: "مدیریت کاربران", href: "/" },
+  { id: 3, name: "مدیریت گروه های درمانی", href: "/" },
+  { id: 4, name: "مدیریت بیماری ها", href: "/CallUs" },
+  { id: 5, name: "مدیریت پرسشنامه ها", href: "/" },
+  { id: 6, name: "مدیریت جلسات", href: "/Login" },
+  { id: 7, name: "مدیریت پیامک ها", href: "/Login" },
+  { id: 8, name: "پرونده بیماران", href: "/Login" },
+  { id: 9, name: "مدیریت گروه ها", href: "/Login" },
+  { id: 10, name: "مدیریت آزمون ها", href: "/Login" },
+];
+
+export const doctorMenuItems = [
+  { id: 1, name: "صفحه اصلی", href: "/" },
+  { id: 2, name: "مدیریت کاربران", href: "/" },
+  { id: 3, name: "مدیریت گروه های درمانی", href: "/" },
+  { id: 4, name: "مدیریت بیماری ها", href: "/CallUs" },
+  { id: 5, name: "مدیریت پرسشنامه ها", href: "/" },
+  { id: 6, name: "مدیریت جلسات", href: "/Login" },
+  { id: 7, name: "مدیریت پیامک ها", href: "/Login" },
+  { id: 8, name: "پرونده بیماران", href: "/Login" },
+  { id: 9, name: "مدیریت گروه ها", href: "/Login" },
+  { id: 10, name: "مدیریت آزمون ها", href: "/Login" },
+];
+
+export const userMenuItems = [
+  { id: 1, name: "پرونده پزشکی", href: "/" },
+  { id: 2, name: "برنامه درمانی", href: "/" },
+  { id: 3, name: "آزمون ها", href: "/" },
+];
+
 export const sliderItems = [
   { id: 1, img: bgimg },
   { id: 2, img: bgimg },
@@ -86,9 +118,9 @@ export const counterItems = [
 ];
 
 export const requestItems = [
-  { id: 1, name: "درخواست از طرف شهروند" },
+  { id: 1, name: "درخواست از طرف بیمار" },
   { id: 2, name: "دریافت کد رهگیری" },
-  { id: 3, name: "بررسی توسط بازرس شهرداری" },
+  { id: 3, name: "بررسی توسط کارشناس شهرداری" },
   { id: 4, name: " اعلام نتیجه درخواست" },
 ];
 
@@ -129,29 +161,30 @@ export const callUsItems = [
   },
 ];
 
+export const PatientMenuItems = [
+  { id: 1, name: "پیشخوان", href: "/UserPanel/PatientDashboard" },
+  { id: 2, name: "برنامه گروه درمانی", href: "/UserPanel/PatientDashboard/MySessions" },
+  {id: 3,name: " آزمون ها",href: "/UserPanel/PatientDashboard/MyTests",},
+];
+
 export const ControllerMenuItems = [
   { id: 1, name: "پیشخوان", href: "/UserPanel/ControllerDashboard" },
-  { id: 2, name: "گزارش ها", href: "/UserPanel/ControllerDashboard/Complaints" },
-  {
-    id: 3,
-    name: " آمار و اطلاعات",
-    href: "/UserPanel/ControllerDashboard/Reports",
-  },
+  { id: 2, name: "مدیریت بیماران", href: "/UserPanel/ControllerDashboard/PatientManagement" },
+  { id: 3, name: "برنامه جلسات", href: "/UserPanel/ControllerDashboard/CounselingSessions" },
+  { id: 4, name: "گروه های من", href: "/UserPanel/ControllerDashboard/PatientGroups" },
 ];
 
 export const AdminMenuItems = [
   { id: 1, name: "پیشخوان", href: "/UserPanel/AdminDashboard" },
-  // { id: 2, name: "مدیریت کاربران", href: "/UserPanel/AdminDashboard/UserManagement" },
-  {
-    id: 3,
-    name: "مدیریت کلید ها",
-    href: "/UserPanel/AdminDashboard/KeysManagement",
-  },
-  { id: 4, name: "سازمان ها", href: "/UserPanel/AdminDashboard/Organizations" },
-  { id: 5, name: "دسته بندی ها", href: "/UserPanel/AdminDashboard/Categories" },
-  { id: 6, name: "اخبار", href: "/UserPanel/AdminDashboard/News" },
-  { id: 7, name: "اسلایدر", href: "/UserPanel/AdminDashboard/Slider" },
-  { id: 8, name: "مدیریت محتوا", href: "/UserPanel/AdminDashboard/WebContents" },
+  { id: 2, name: "مدیریت کاربران", href: "/UserPanel/AdminDashboard/UserManagement" },
+  {id: 3,name: "مدیریت بیماران",href: "/UserPanel/AdminDashboard/PatientManagement"},
+  { id: 4, name: "مدیریت گروه ها", href: "/UserPanel/AdminDashboard/PatientGroups" },
+  { id: 5, name: "مدیریت آزمون ها", href: "/UserPanel/AdminDashboard/TestPeriods" },
+  { id: 6, name: "مدیریت جلسات", href: "/UserPanel/AdminDashboard/CounselingSessions" },
+  { id: 7, name: "مدیریت پرسش ها", href: "/UserPanel/AdminDashboard/Questions" },
+  { id: 8, name: "مدیریت نتایج", href: "/UserPanel/AdminDashboard/TestPeriodResults" },
+
+  //{ id: 8, name: "مدیریت محتوا", href: "/UserPanel/AdminDashboard/WebContents" },
 ];
 
 export const ControllerTableItems = [
@@ -185,7 +218,7 @@ export const ComplainDetailsItems = [
   },
   {
     id: 2,
-    title: "تایید توسط بازرس ...",
+    title: "تایید توسط کارشناس ...",
     desc: "سند  54841",
     date: "1402/09/05",
     time: " 12:58 ",
@@ -213,22 +246,28 @@ export const AdminCardItems = [
   { id: 4, name: "تعداد گزارشات ارسال شده", count: "400" },
 ];
 
+export const PatientCardItems = [
+  { id: 1, name: "تعداد بیماران ثبت شده", count: "100" },
+  { id: 2, name: "تعداد بیماران تایید شده", count: "200" },
+  { id: 3, name: "تعداد بیماران رد شده", count: "300" },
+];
+
 export const AdminTableItems = [
   {
     id: 1,
-    name: "محمد یزدی زاده",
-    phone: "09134504190",
-    useRole: "ادمین",
-    date: "1402/09/05",
-    desc: "واحد روابط عمومی شهرداری",
+    name: "محمد محمدی",
+    phone: "09375998745",
+    useRole: "منتور",
+    date: "1403/09/05",
+    desc: " منتور گروه درمانی تخمدان خوشخیم درجه 3	",
   },
   {
     id: 2,
-    name: "محسن یزدی پناه",
-    phone: "09134504190",
-    useRole: "ادمین",
-    date: "1402/09/05",
-    desc: "واحد روابط عمومی شهرداری",
+    name: "احمد یزدان پناه",
+    phone: "09135131373",
+    useRole: "منتور",
+    date: "1403/09/05",
+    desc: "  منتور گروه درمانی پروستات بدخیم درجه 1  ",
   },
 ];
 
@@ -236,7 +275,7 @@ export const Operations = [
   { value: 0, name: "ثبت شده" },
   { value: 1, name: "دیدن" },
   { value: 2, name: "درخواست توضیحات" },
-  { value: 3, name: "پاسخ شهروند" },
+  { value: 3, name: "پاسخ بیمار" },
   { value: 4, name: "لغو درخواست" },
   { value: 5, name: "افزودن جزییات" },
   { value: 6, name: "پایان درخواست" },
@@ -248,4 +287,23 @@ export const errorMessages = {
   400: "مشکلی در ارسال درخواست به وجود آمد.",
   480: "لطفا تمام اطلاعات خواسته شده را وارد نمایید.",
   428: "کد فعالسازی را وارد نمایید.",
+};
+
+export const getGadScoreDescription = (score: number | null): string => {
+  if (score === null) return "-";
+  if (score >= 0 && score <= 4) return "حداقل اضطراب";
+  if (score >= 5 && score <= 9) return "اضطراب خفیف";
+  if (score >= 10 && score <= 14) return "اضطراب متوسط";
+  if (score >= 15) return "اضطراب شدید";
+  return "-";
+};
+
+export const getMddScoreDescription = (score: number | null): string => {
+  if (score === null) return "-";
+  if (score >= 0 && score <= 4) return "حداقل خطر";
+  if (score >= 5 && score <= 9) return "افسردگی خفیف";
+  if (score >= 10 && score <= 14) return "افسردگی متوسط";
+  if (score >= 15 && score <= 19) return "افسردگی Moderately Severe";
+  if (score >= 20) return "افسردگی شدید";
+  return "-";
 };

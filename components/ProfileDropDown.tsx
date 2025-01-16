@@ -55,8 +55,11 @@ export default function ProfileDropDown() {
     const userRole = localStorage.getItem("Hami_Role");
     if (userRole == "Admin") {
       setRole("AdminDashboard");
-    } else {
+    } else if (userRole == "Mentor") {
       setRole("ControllerDashboard");
+    }
+    else  { //if (userRole == "Patient")
+      setRole("PatientDashboard");
     }
   }, []);
 

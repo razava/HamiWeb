@@ -24,4 +24,9 @@ export async function getOptions() {
   return data.data;
 }
 
+export async function submitDailyMood(mood: number) {
+  return await axios.post("api/TestPeriodResult/mood", { mood }, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+}
 

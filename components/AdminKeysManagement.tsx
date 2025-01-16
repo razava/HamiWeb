@@ -441,7 +441,7 @@ export default function AdminKeysManagement() {
                   </div>
 
                   {/* <p className="text-sm font-normal leading-normal  text-slate-500">
-                    آیدی بازرس:{" "}
+                    آیدی کارشناس:{" "}
                     <span className="self-end  text-slate-800">
                       {item.inspectorId}
                     </span>

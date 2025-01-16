@@ -33,8 +33,8 @@ const useSignalR = () => {
           
           postConnectionIdMutation.mutate(connection.connectionId);
           connection.on("Created", (message) => {
-            queryClient.invalidateQueries(["ComplaintsList"]);
-            toast.info("یک گزارش جدید دارید.");
+            queryClient.invalidateQueries(["PatientsList"]);
+            toast.info("یک بیمار جدید دارید.");
           });
           connection.on("Updated", (message, id) => {
             toast.info(`${message}`);
@@ -48,16 +48,9 @@ const useSignalR = () => {
       };
 
       startConnection();
+    
     }
 
-   
-
-    // return () => {
-    //   if (connection.state === "Connected") {
-    //     connection.stop();
-    //     console.log("SignalR disconnected");
-    //   }
-    // };
   }, []);
 
   useEffect(() => {
@@ -65,18 +58,7 @@ const useSignalR = () => {
       console.log(connection.connectionId);
     }
   }, [connection]);
-  // console.log(connection.state);
-  // useEffect(() => {
-  //   console.log(11111);
-  //   console.log(connection.state);
-  //   // Subscribe to events and update query data accordingly
-  //   // Example: Listen for a "newMessage" event and update a query with the new message data
-
-  //   console.log(connection.state);
-
-  // }, [queryClient]);
-
-  // return connection;
+ 
 };
 
 export default useSignalR;

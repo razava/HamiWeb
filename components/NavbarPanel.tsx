@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AdminMenuItems, ControllerMenuItems } from "@/constants";
+import { AdminMenuItems, ControllerMenuItems, PatientMenuItems } from "@/constants";
 import { usePathname, useRouter } from "next/navigation";
 import { Squash as Hamburger } from "hamburger-react";
 import { AnimatePresence, motion } from "framer-motion";
@@ -43,7 +43,8 @@ export default function NavbarPanel() {
 
   const menus = {
     Admin: AdminMenuItems,
-    Inspector: ControllerMenuItems,
+    Mentor: ControllerMenuItems,
+    Patient: PatientMenuItems,
   };
   const selectedMenu = menus[role as keyof typeof menus];
 
@@ -56,7 +57,8 @@ export default function NavbarPanel() {
     localStorage.removeItem("privatePassword");
     router.push("/");
   };
-  const signalr = useSignalR();
+  
+  // const signalr = useSignalR();
 
   return (
     <div className="fixed top-0 z-10 flex flex-row items-center justify-between w-full gap-3 px-8 py-4 shadow-md sm:items-center sm:gap-0 bg-blue max-md:px-4 ">

@@ -60,7 +60,7 @@ export default function Search({
             changeValue(e.target.value);
           }
         }}
-        placeholder="جستجو بر اساس کد پیگیری"
+        placeholder=" نام کاربری"
       />
       {cancel ? (
         <button

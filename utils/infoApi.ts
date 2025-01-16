@@ -14,7 +14,19 @@ export async function getInfoList() {
   const data = await axios.get("api/Info/List");
   return data.data;
 }
+
 export async function getInfo(id: string = "0") {
   const data = await axios.get(`api/Info/${id}`);
   return data.data;
 }
+
+export async function getInfoByUserId(code: string, userId: string = "") {
+  const data = await axios.post(`api/Info/${code}`, userId, {
+    headers: {
+      "Content-Type": "application/json", // ارسال Body به‌صورت JSON
+    },
+  });
+  return data.data;
+}
+
+

@@ -128,9 +128,6 @@ export default function Login() {
                         {...field}
                       />
                     </FormControl>
-                    {/* <FormDescription>
-                    This is your public display name.
-                  </FormDescription> */}
                     <FormMessage />
                   </FormItem>
                 )}
@@ -163,9 +160,6 @@ export default function Login() {
                   rules={{ required: true }}
                   render={({ field }) => (
                     <FormItem className="items-center flex-1 h-10 ">
-                      {/* <FormLabel className="text-[#7C838A]  text-sm font-medium mt-7">
-                    رمز عبور
-                  </FormLabel> */}
                       <FormControl>
                         <Input placeholder="کد امنیتی" {...field} />
                       </FormControl>
@@ -204,31 +198,39 @@ export default function Login() {
                   </div>
                 )}
               </div>
-              <div className="flex justify-end w-full gap-2 mt-14">
-                <Button
-                  disabled={loginMutation.isPending}
-                  type="submit"
-                  className="w-1/2 p-2 text-white transition bg-blue hover:bg-blue/90 md:w-1/3 rounded-xl"
-                >
-                  {loginMutation.isPending ? (
-                    <div className="flex items-center justify-center gap-2">
-                      <Oval
-                        visible={true}
-                        height="20"
-                        width="20"
-                        color="#fff"
-                        ariaLabel="oval-loading"
-                        wrapperStyle={{}}
-                        wrapperClass=""
-                      />
-                      {/* <p>در حال انجام ...</p> */}
-                    </div>
-                  ) : (
-                    "ورود"
-                  )}
-                  {/* ورود */}
-                </Button>
-              </div>
+              <div className="flex justify-between items-center w-full gap-2 mt-14">
+  <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
+    حساب کاربری ندارید؟ {"   "}
+    <a
+      href="/RegisterForm"
+      className="text-sm font-bold leading-tight tracking-tight text-blue hover:text-blue-700 ml-1"
+    >
+      ثبت نام کنید
+    </a>
+  </p>
+  <Button
+    disabled={loginMutation.isPending}
+    type="submit"
+    className="w-1/2 p-2 text-white transition bg-blue hover:bg-blue/90 md:w-1/3 rounded-xl"
+  >
+    {loginMutation.isPending ? (
+      <div className="flex items-center justify-center gap-2">
+        <Oval
+          visible={true}
+          height="20"
+          width="20"
+          color="#fff"
+          ariaLabel="oval-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+        />
+      </div>
+    ) : (
+      "ورود"
+    )}
+  </Button>
+</div>
+
             </form>
           </Form>
         </div>

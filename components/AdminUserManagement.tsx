@@ -28,14 +28,13 @@ export default function AdminUserManagement() {
       <div className="w-[95vw] lg:w-[85vw] 3xl:w-[70vw] mt-8 max-sm:mt-16 pt-9 ">
         <div className="w-full flex flex-col gap-5  ">
           {/* 1 */}
-          <div className="w-full flex flex-col justify-start gap-3">
+          {/* <div className="w-full flex flex-col justify-start gap-3">
             <div className="w-full text-right text-neutral-600 text-lg font-bold">
               مدیریت کاربران
             </div>
 
             <div className="w-full flex flex-col lg:flex-row justify-center items-center gap-6 ">
               <div className="w-full lg:w-3/5 h-11 bg-white rounded-[5px] block">
-                {/* <Search Cancel={} mode="admin" /> */}
               </div>
 
               <div className="w-full lg:w-2/5  flex flex-row justify-between items-center gap-2 ">
@@ -97,10 +96,10 @@ export default function AdminUserManagement() {
 
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* 2 */}
-          <div className="w-full flex flex-row max-md:flex-wrap justify-center gap-3">
+          {/* <div className="w-full flex flex-row max-md:flex-wrap justify-center gap-3">
             {AdminCardItems.map((item) => {
               return (
                 <div
@@ -116,7 +115,7 @@ export default function AdminUserManagement() {
                 </div>
               );
             })}
-          </div>
+          </div> */}
 
           {/* 3 */}
           <div className="w-full flex flex-col justify-start bg-white rounded-md">

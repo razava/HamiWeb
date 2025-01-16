@@ -4,84 +4,49 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import TableController from "./TableController";
 import Search from "./Search";
 import { useQuery } from "@tanstack/react-query";
-import { getComplaintsList, getPossibleStates } from "@/utils/inspectorApi";
-import { Button } from "@/components/ui/button";
-import { Triangle } from "react-loader-spinner";
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Input } from "./ui/input";
-import { useRouter } from "next/navigation";
-import { Decrypt } from "@/lib/utils";
-import useData from "@/store/useData";
-import { toast } from "sonner";
+import { getPatientsList } from "@/utils/adminApi"; // تابع API برای دریافت لیست بیماران
 import Pagination from "./Pagination";
 import { Skeleton } from "./ui/skeleton";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { useMediaQuery } from "react-responsive";
 
 export default function TabController() {
-  const isMobile = useMediaQuery({ maxWidth: 768 }); // Adjust the max width for mobile
+  const isMobile = useMediaQuery({ maxWidth: 768 }); // بررسی حالت موبایل
 
-  const [search, setSearch] = useState<any>(null);
-  const [page, setPage] = useState<any>(1);
-  const [totalCount, setTotalCount] = useState<any>(0);
-  const [currentPage, setCurrentPage] = useState<any>(0);
-  const [pageSize, setPageSize] = useState<any>(0);
-  const [totalPages, setTotalPages] = useState<any>(0);
-  const [cancel, setCancel] = useState<boolean>(false);
+  const [search, setSearch] = useState<string>(""); // فیلتر جستجو
+  const [page, setPage] = useState<number>(1); // شماره صفحه
+  const [totalCount, setTotalCount] = useState<number>(0); // کل تعداد بیماران
+  const [currentPage, setCurrentPage] = useState<number>(0); // صفحه فعلی
+  const [pageSize, setPageSize] = useState<number>(0); // تعداد آیتم‌های هر صفحه
+  const [totalPages, setTotalPages] = useState<number>(0); // کل صفحات
+  const [selectedTab, setSelectedTab] = useState<string>("1"); // وضعیت پیش‌فرض: "منتظر تأیید"
 
-  const router = useRouter();
+  // داده‌های ثابت برای وضعیت‌ها
+  const userStatuses = [
+    { value: "1", title: "منتظر تأیید" },
+    { value: "2", title: "تأیید‌شده" },
+    { value: "3", title: "رد‌شده" },
+  ];
 
-  const [psblState, setPsblState] = useState(0);
-  const [selectedTab, setSelectedTab] = useState<string>("0");
-
-  const {
-    data: dataState,
-    isLoading: isLoadingState,
-    refetch: refetchState,
-  } = useQuery({
-    queryKey: ["PossibleStates"],
-    queryFn: () => getPossibleStates(),
-    refetchOnWindowFocus: false,
-  });
-
+  // دریافت لیست بیماران با فیلتر وضعیت
   const { data, isLoading, refetch } = useQuery({
-    queryKey: ["ComplaintsList", psblState, dataState, page],
+    queryKey: ["PatientsList", selectedTab, page, search],
     queryFn: () =>
-      getComplaintsList({
-        states: psblState,
-        TrackingNumber: search,
+      getPatientsList({
+        Status: Number(selectedTab), // وضعیت انتخابی
+        UserName: search, // جستجو
         PageNumber: page,
       }),
     refetchOnWindowFocus: false,
   });
 
-  const handelSearch = (event: any) => {
-    setPage(1);
-    refetch();
-  };
-  useEffect(() => {
-    if (cancel) {
-      refetch();
-    }
-  }, [cancel]);
-
+  // به‌روزرسانی مقادیر صفحه‌بندی
   useEffect(() => {
     if (data) {
       const headersData = JSON.parse(data.headers["x-pagination"]);
@@ -89,80 +54,73 @@ export default function TabController() {
       setTotalPages(headersData.TotalPages);
       setCurrentPage(headersData.CurrentPage);
       setPageSize(headersData.PageSize);
-      setCancel(false);
     }
   }, [data]);
-  useEffect(() => {
-    const activeTab = localStorage.getItem("ActiveTab");
-    const activePage = localStorage.getItem("ActivePage");
-    if (activeTab) {
-      setSelectedTab(activeTab);
-      setPsblState(Number(activeTab));
-    }
-    if (activePage) {
-      setCurrentPage(activePage);
-    }
-  }, []);
-  
-  const isZero = totalCount === 0;
+
+  const handleSearch = () => {
+    setPage(1); // بازگشت به صفحه اول در جستجو
+    refetch();
+  };
+
+  const isZero = totalCount === 0; // بررسی خالی بودن لیست بیماران
 
   return (
     <div className="w-[95vw] lg:w-[82vw] xl:w-[70vw] 3xl:w-[65vw] mt-16 pt-9 mx-auto">
       {isMobile ? (
-        // Render your shadcn Select for mobile
+        // نمایش در حالت موبایل
         <div>
-          <Tabs value={String(selectedTab)} className="" dir="rtl">
+          <Tabs value={selectedTab} className="" dir="rtl">
+            {/* Dropdown برای وضعیت در موبایل */}
             <div className="flex flex-col-reverse items-center justify-between w-full gap-4 mb-5 lg:flex-row lg:gap-2">
               <Select
                 value={selectedTab}
                 onValueChange={(value) => {
-                  setPsblState(Number(value));
-                  setSelectedTab(String(value));
-                  localStorage.setItem("ActiveTab", String(value));
-                  localStorage.setItem("ActivePage", page);
-                  refetch();
-                  setSearch("");
+                  setSelectedTab(value);
                   setPage(1);
+                  refetch();
                 }}
               >
-                <SelectTrigger className="w-full h-12 bg-[#E9E9E9] " dir="rtl">
-                  <SelectValue placeholder="انتخاب دسته بندی" />
+                <SelectTrigger className="w-full h-12 bg-[#E9E9E9]" dir="rtl">
+                  <SelectValue placeholder="انتخاب وضعیت" />
                 </SelectTrigger>
                 <SelectContent dir="rtl">
-                  {dataState?.map((item: any) => (
-                    <SelectItem key={item.value} value={String(item.value)}>
-                      {item.title} ({item.count})
+                  {userStatuses.map((item) => (
+                    <SelectItem key={item.value} value={item.value}>
+                      {item.title}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-              {/* Search Box */}
+
+              {/* کامپوننت جستجو */}
               <Search
                 value={search}
                 changeValue={(data: any) => setSearch(data)}
                 mode="controller"
-                action={handelSearch}
-                Cancel={() => setCancel(true)}
+                action={handleSearch}
+                Cancel={() => setSearch("")}
               />
             </div>
 
-            {/* Tab Content */}
-            <TabsContent value={selectedTab} key={selectedTab}>
-              {data ? (
-                <TableController
-                  data={data?.data}
-                  currentPage={currentPage}
-                  pageSize={pageSize}
-                />
-              ) : (
+            {/* محتوای وضعیت */}
+            <TabsContent value={selectedTab}>
+              {isLoading ? (
                 <div className="flex flex-col gap-3">
                   <Skeleton className="w-full h-12" />
                   <Skeleton className="w-full h-12" />
                   <Skeleton className="w-full h-12" />
-                  <Skeleton className="w-full h-12" />
                 </div>
+              ) : (
+                <TableController
+                  data={data?.data || []}
+                  currentPage={currentPage}
+                  pageSize={pageSize}
+                  userRole="Admin" // Replace "someUserRole" with the actual user role value
+                  
+                />
               )}
 
+              {/* صفحه‌بندی */}
               {!isZero ? (
                 <Pagination
                   TotalPages={totalPages}
@@ -171,155 +129,69 @@ export default function TabController() {
                   Page={(num: number) => setPage(num + 1)}
                 />
               ) : (
-                <>
-                  {" "}
-                  {data?.data.length == 0 && (
-                    <p className="flex justify-center mx-auto mt-10 text-blue/50">
-                      گزارشی وجود ندارد
-                    </p>
-                  )}
-                </>
+                <p className="flex justify-center mx-auto mt-10 text-blue/50">
+                  لیستی برای نمایش وجود ندارد
+                </p>
               )}
             </TabsContent>
           </Tabs>
         </div>
       ) : (
-        // Render Tabs for larger screens
-        // <Tabs value={String(selectedTab)} className="" dir="rtl">
-        //   <div className="flex flex-col-reverse items-center justify-between w-full gap-4 mb-5 lg:flex-row lg:gap-2">
-
-        //     {/* Tab Title  */}
-        //     <TabsList className="flex w-full gap-1 h-a max-lg:flex-wrap max lg:w-4/5 md:gap-4 lg:gap-1 p-1">
-        //       {/* <p className="text-xs font-bold 3xl:ml-6 sm:text-sm max-xl:hidden">
-        //       لیست شکایت ها |
-        //     </p> */}
-
-        //       {dataState?.map((item: any) => {
-        //         return (
-        //           <TabsTrigger
-        //             key={item.value}
-        //             className="hover:border-b-2 border-b-blue flex-1 h-10"
-        //             value={String(item.value)}
-        //             // data-state={isActive ? 'active' : 'inactive'}
-        //             onClick={() => {
-        //               setPsblState(item.value);
-        //               setSelectedTab(String(item.value));
-        //               localStorage.setItem("ActiveTab", String(item.value));
-        //               localStorage.setItem("ActivePage", page);
-        //               refetch();
-        //               setSearch("");
-        //               setPage(1);
-        //             }}
-        //           >
-        //             <div className="relative w-full ">
-        //               {item.title} ({item.count})
-        //             </div>
-        //           </TabsTrigger>
-        //         );
-        //       })}
-        //     </TabsList>
-
-        //     {/* Search Box */}
-        //     <Search
-        //       value={search}
-        //       changeValue={(data: any) => setSearch(data)}
-        //       mode="controller"
-        //       action={handelSearch}
-        //       Cancel={() => setCancel(true)}
-        //     />
-        //   </div>
-
-        //   {/* Tab Content */}
-
-        //   <TabsContent value={selectedTab} key={selectedTab}>
-        //     {data ? (
-        //       <TableController
-        //         data={data?.data}
-        //         currentPage={currentPage}
-        //         pageSize={pageSize}
-        //       />
-        //     ) : (
-        //       <div className="flex flex-col gap-3">
-        //         <Skeleton className="w-full h-12" />
-        //         <Skeleton className="w-full h-12" />
-        //         <Skeleton className="w-full h-12" />
-        //         <Skeleton className="w-full h-12" />
-        //       </div>
-        //     )}
-
-        //     {!isZero ? (
-        //       <Pagination
-        //         TotalPages={totalPages}
-        //         currentPage={currentPage - 1}
-        //         countPage={totalCount}
-        //         Page={(num: number) => setPage(num + 1)}
-        //       />
-        //     ) : (
-        //       <>
-        //         {" "}
-        //         {data?.data.length == 0 && (
-        //           <p className="flex justify-center mx-auto mt-10 text-blue/50">
-        //             درخواستی وجود ندارد
-        //           </p>
-        //         )}
-        //       </>
-        //     )}
-        //   </TabsContent>
-        // </Tabs>
+        // نمایش در حالت دسکتاپ
         <div>
-          <Tabs value={String(selectedTab)} className="" dir="rtl">
+          <Tabs value={selectedTab} className="" dir="rtl">
+            {/* تب‌ها در دسکتاپ */}
             <div className="flex flex-col-reverse items-center justify-between w-full gap-4 mb-5 lg:flex-row lg:gap-2">
-              {/* Tab Title  */}
-              <TabsList className="flex w-full gap-1 h-a max-lg:flex-wrap max lg:w-4/5 md:gap-4 lg:gap-1 p-1">
-                {dataState?.map((item: any) => (
+              {/* تب‌ها در دسکتاپ */}
+              <TabsList className="flex w-full gap-1 lg:w-4/5 p-1 bg-gray-100 rounded-md shadow-md max-lg:flex-wrap">
+                {userStatuses.map((item) => (
                   <TabsTrigger
                     key={item.value}
-                    className="hover:border-b-2 border-b-blue flex-1 h-10"
-                    value={String(item.value)}
+                    value={item.value}
+                    className={`flex-1 h-8 px-4 py-1 text-sm font-medium text-gray-700 transition-colors duration-200 border rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                      selectedTab === item.value
+                        ? "bg-blue-100 text-blue-700 border-blue-500"
+                        : "bg-white text-gray-700 border-gray-300"
+                    }`}
                     onClick={() => {
-                      setPsblState(item.value);
-                      setSelectedTab(String(item.value));
-                      localStorage.setItem("ActiveTab", String(item.value));
-                      localStorage.setItem("ActivePage", String(currentPage));
-                      refetch();
-                      setSearch("");
+                      setSelectedTab(item.value);
                       setPage(1);
+                      refetch();
                     }}
                   >
-                    <div className="relative w-full ">
-                      {item.title} ({item.count})
-                    </div>
+                    {item.title}
                   </TabsTrigger>
                 ))}
               </TabsList>
 
-              {/* Search Box */}
+              {/* کامپوننت جستجو */}
               <Search
                 value={search}
                 changeValue={(data: any) => setSearch(data)}
                 mode="controller"
-                action={handelSearch}
-                Cancel={() => setCancel(true)}
+                action={handleSearch}
+                Cancel={() => setSearch("")}
               />
             </div>
 
-            {/* Tab Content */}
-            <TabsContent value={selectedTab} key={selectedTab}>
-              {data ? (
-                <TableController
-                  data={data?.data}
-                  currentPage={currentPage}
-                  pageSize={pageSize}
-                />
-              ) : (
+            {/* محتوای وضعیت */}
+            <TabsContent value={selectedTab}>
+              {isLoading ? (
                 <div className="flex flex-col gap-3">
                   <Skeleton className="w-full h-12" />
                   <Skeleton className="w-full h-12" />
                   <Skeleton className="w-full h-12" />
-                  <Skeleton className="w-full h-12" />
                 </div>
+              ) : (
+                <TableController
+                  data={data?.data || []}
+                  currentPage={currentPage}
+                  pageSize={pageSize}
+                  userRole="Admin"
+                />
               )}
 
+              {/* صفحه‌بندی */}
               {!isZero ? (
                 <Pagination
                   TotalPages={totalPages}
@@ -328,14 +200,9 @@ export default function TabController() {
                   Page={(num: number) => setPage(num + 1)}
                 />
               ) : (
-                <>
-                  {" "}
-                  {data?.data.length == 0 && (
-                    <p className="flex justify-center mx-auto mt-10 text-blue/50">
-                      گزارشی وجود ندارد
-                    </p>
-                  )}
-                </>
+                <p className="flex justify-center mx-auto mt-10 text-blue/50">
+                  لیستی برای نمایش وجود ندارد
+                </p>
               )}
             </TabsContent>
           </Tabs>
