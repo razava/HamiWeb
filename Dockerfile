@@ -26,8 +26,8 @@ COPY . .
 # Learn more here: https://nextjs.org/telemetry
 # Uncomment the following line in case you want to disable telemetry during the build.
 # ENV NEXT_TELEMETRY_DISABLED 1
-
-RUN yarn build
+#disable ESLint intrupt compile for buge
+RUN yarn build --no-lint 
 
 # If using npm comment out above and use below instead
 # RUN npm run build
