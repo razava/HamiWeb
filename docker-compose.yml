@@ -1,8 +1,7 @@
 version: '3.8'
 services:
   web:
-    image: ${DOCKER_REGISTRY:-docker.shetabdahi.ir/}oyoon-admin
+    image: ${DOCKER_REGISTRY:-razava/hamiweb:latest} # تنظیم نام مخزن Docker Hub
     restart: always
     ports:
-      - "127.0.0.1:6679:6679"
-
+      - "127.0.0.1:6679:6679" # تنظیم پورت‌ها برای دسترسی محلی
