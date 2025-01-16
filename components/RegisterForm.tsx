@@ -82,22 +82,22 @@ const Step2Schema = z.object({
       required_error: "لطفاً سطح بیماری را انتخاب کنید.",
     })
     .optional(), // سطح بیماری (می‌تواند خالی باشد)
-  // pathologyDiagnosis: z
-  //   .string()
-  //   .max(200, {
-  //     message: "تشخیص پاتولوژی نمی‌تواند بیشتر از 200 کاراکتر باشد.",
-  //   })
-  //   .optional(), // تشخیص پاتولوژی (اختیاری)
-  // initialWeight: z
-  //   .number({ invalid_type_error: "وزن اولیه باید یک مقدار عددی باشد." })
-  //   // .positive({ message: "وزن اولیه باید بزرگتر از صفر باشد." })
-  //   // .max(300, { message: "وزن اولیه نمی‌تواند بیشتر از 300 کیلوگرم باشد." })
-  //   .optional(), // وزن اولیه (اختیاری)
-  // sleepDuration: z
-  //   .number({ invalid_type_error: "مدت خوابیدن باید یک مقدار عددی باشد." })
-  //   .positive({ message: "مدت خوابیدن باید بزرگتر از صفر باشد." })
-  //   .max(24, { message: "مدت خوابیدن نمی‌تواند بیشتر از 24 ساعت باشد." })
-  //   .optional(), // مدت خوابیدن (اختیاری)
+  pathologyDiagnosis: z
+    .string()
+    .max(200, {
+      message: "تشخیص پاتولوژی نمی‌تواند بیشتر از 200 کاراکتر باشد.",
+    })
+    .optional(), // تشخیص پاتولوژی (اختیاری)
+  initialWeight: z
+    .number({ invalid_type_error: "وزن اولیه باید یک مقدار عددی باشد." })
+    // .positive({ message: "وزن اولیه باید بزرگتر از صفر باشد." })
+    // .max(300, { message: "وزن اولیه نمی‌تواند بیشتر از 300 کیلوگرم باشد." })
+    .optional(), // وزن اولیه (اختیاری)
+  sleepDuration: z
+    .number({ invalid_type_error: "مدت خوابیدن باید یک مقدار عددی باشد." })
+    .positive({ message: "مدت خوابیدن باید بزرگتر از صفر باشد." })
+    .max(24, { message: "مدت خوابیدن نمی‌تواند بیشتر از 24 ساعت باشد." })
+    .optional(), // مدت خوابیدن (اختیاری)
   appetiteLevel: z.enum(["1", "2", "3"], {
     required_error: "لطفاً میزان اشتها را انتخاب کنید.",
   }), // میزان اشتها
