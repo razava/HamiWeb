@@ -54,10 +54,11 @@ export default function Register() {
   const loginMutation = useMutation({
     mutationFn: logisterCitizen,
     onSuccess: (res: any | string) => {
-      router.push("/Verify");
-      localStorage.setItem("VerifyRole", "citizen");
-      localStorage.setItem("ShowPreRegister", "yes");
-      localStorage.setItem("verificationToken", res);
+      router.push("/RegisterForm");
+      //localStorage.setItem("VerifyRole", "Patient");
+      //localStorage.setItem("RegisterUser", res);//Implement For Rejected User Needed
+      localStorage.setItem("RegisterPhone",form.getValues("phoneNumber") );
+      //localStorage.setItem("verificationToken", res);
     },
     onError: (err: any | string) => {
       refetch();

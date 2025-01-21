@@ -202,7 +202,7 @@ export default function Login() {
   <p className="text-sm text-gray-500 dark:text-gray-400 flex items-center">
     حساب کاربری ندارید؟ {"   "}
     <a
-      href="/RegisterForm"
+      href="/Register"
       className="text-sm font-bold leading-tight tracking-tight text-blue hover:text-blue-700 ml-1"
     >
       ثبت نام کنید

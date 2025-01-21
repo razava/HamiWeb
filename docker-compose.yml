@@ -1,7 +1,13 @@
 version: '3.8'
 services:
-  web:
-    image: ${DOCKER_REGISTRY:-razava/hamiweb:latest} # تنظیم نام مخزن Docker Hub
+  hamiweb:
+    image: razava/hamiweb:latest
     restart: always
     ports:
-      - "127.0.0.1:6679:6679" # تنظیم پورت‌ها برای دسترسی محلی
+      - "127.0.0.1:6770:6679"
+    networks:
+      - oyoon-api_default
+
+networks:
+  oyoon-api_default:
+    external: true

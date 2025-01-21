@@ -5,9 +5,12 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { getSessionUsers, submitAttendanceLogs } from "@/utils/adminApi";
 import { Triangle } from "react-loader-spinner";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation"; // ایمپورت useRouter
 
 export default function MentorSessionAttendanceUsers({ sessionId }: { sessionId: string }) {
   const [attendanceData, setAttendanceData] = useState<any[]>([]);
+  const [isSubmitted, setIsSubmitted] = useState(false); // مدیریت وضعیت ارسال
+  const router = useRouter(); // استفاده از useRouter
 
   // گرفتن لیست کاربران عضو گروه جلسه
   const { data: users, isLoading } = useQuery({
@@ -33,6 +36,7 @@ export default function MentorSessionAttendanceUsers({ sessionId }: { sessionId:
     mutationFn: submitAttendanceLogs,
     onSuccess: (data) => {
       toast.success("حضور و غیاب با موفقیت ثبت شد!");
+      setIsSubmitted(true); // غیر فعال کردن دکمه پس از ثبت موفق
     },
     onError: (error) => {
       toast.error("خطا در ثبت حضور و غیاب!");
@@ -76,6 +80,14 @@ export default function MentorSessionAttendanceUsers({ sessionId }: { sessionId:
 
   return (
     <div className="w-full max-w-4xl mx-auto bg-white p-6 rounded shadow">
+      {/* دکمه بازگشت */}
+      <button
+        onClick={() => router.back()} // بازگشت به صفحه قبلی
+        className="px-4 py-2 mb-4 text-white bg-gray-500 rounded hover:bg-gray-600"
+      >
+        بازگشت
+      </button>
+
       <h2 className="text-xl font-bold mb-6">ثبت حضور و غیاب جلسه</h2>
 
       {/* جدول کاربران */}
@@ -135,9 +147,14 @@ export default function MentorSessionAttendanceUsers({ sessionId }: { sessionId:
 
       <button
         onClick={handleSubmit}
-        className="px-4 py-2 bg-green-500 text-white mt-6 rounded hover:bg-green-600"
+        disabled={isSubmitted} // غیر فعال کردن دکمه بعد از ثبت موفق
+        className={`px-4 py-2 mt-6 rounded ${
+          isSubmitted
+            ? "bg-gray-400 text-white cursor-not-allowed"
+            : "bg-green-500 text-white hover:bg-green-600"
+        }`}
       >
-        ثبت حضور و غیاب 
+        {isSubmitted ? "ثبت شد" : "ثبت حضور و غیاب"}
       </button>
     </div>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import {
@@ -43,6 +43,14 @@ export default function MentorCounselingSessions() {
 
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null); // گروه انتخاب‌شده
 
+  // مقدار اولیه را از localStorage بخوانید
+  useEffect(() => {
+    const savedGroup = localStorage.getItem("selectedGroup");
+    if (savedGroup) {
+      setSelectedGroup(savedGroup);
+    }
+  }, []);
+
   // گرفتن لیست جلسات
   const { data: sessions, isLoading: isSessionsLoading } = useQuery({
     queryKey: ["CounselingSessions", selectedGroup],
@@ -59,6 +67,16 @@ export default function MentorCounselingSessions() {
     queryFn: getMentorPatientGroups,
   });
 
+  // مدیریت تغییر گروه و ذخیره در localStorage
+  const handleGroupChange = (groupId: string | null) => {
+    setSelectedGroup(groupId);
+    if (groupId) {
+      localStorage.setItem("selectedGroup", groupId); // ذخیره در localStorage
+    } else {
+      localStorage.removeItem("selectedGroup"); // حذف مقدار ذخیره‌شده
+    }
+  };
+
   return (
     <div className="w-full min-h-screen p-6 flex flex-col items-center bg-[#f9f9f9] mt-20">
       <div className="w-full max-w-7xl bg-white rounded-lg shadow-md p-6">
@@ -69,14 +87,15 @@ export default function MentorCounselingSessions() {
           </label>
           <select
             value={selectedGroup || ""}
-            onChange={(e) => setSelectedGroup(e.target.value || null)}
+            onChange={(e) => handleGroupChange(e.target.value || null)}
             className="w-full p-2 border rounded-md"
           >
             <option value="">همه گروه‌ها</option>
             {isGroupsLoading ? (
               <option>در حال بارگذاری...</option>
             ) : (
-              Array.isArray(groups) && groups.map((group: any) => (
+              Array.isArray(groups) &&
+              groups.map((group: any) => (
                 <option key={group.id} value={group.id}>
                   {group.description}
                 </option>
@@ -117,9 +136,7 @@ export default function MentorCounselingSessions() {
                       {session.topic}
                     </h3>
                     <p className="text-sm text-gray-500 mt-2">
-                      <span className="font-semibold text-gray-700">
-                        گروه:{" "}
-                      </span>
+                      <span className="font-semibold text-gray-700">گروه: </span>
                       {session.patientGroupName}
                     </p>
                     <p className="text-sm text-gray-500 mt-2">
@@ -129,23 +146,22 @@ export default function MentorCounselingSessions() {
                       {convertFullTime(session.scheduledDate)}
                     </p>
                     <p className="text-sm text-gray-500 mt-2">
-                      <span className="font-semibold text-gray-700">
-                        وضعیت:
-                      </span>{" "}
+                      <span className="font-semibold text-gray-700">وضعیت:</span>{" "}
                       {sessionStatus}
                     </p>
 
                     {/* لینک جلسه فقط برای جلساتی که هنوز برگزار نشده‌اند */}
-                    {!session.isConfirmed && sessionStatus === "در حال برگزاری" && (
-                      <a
-                        href={session.meetingLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-green-600 hover:text-green-700 underline"
-                      >
-                        لینک جلسه
-                      </a>
-                    )}
+                    {!session.isConfirmed &&
+                      sessionStatus === "در حال برگزاری" && (
+                        <a
+                          href={session.meetingLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-green-600 hover:text-green-700 underline"
+                        >
+                          لینک جلسه
+                        </a>
+                      )}
 
                     {/* دکمه‌ها برای وضعیت‌های مختلف */}
                     <div className="mt-4 flex justify-end gap-4">
@@ -155,7 +171,7 @@ export default function MentorCounselingSessions() {
                           onClick={(e) => {
                             e.stopPropagation();
                             router.push(
-                              `/UserPanel/ControllerDashboard/CounselingSessions/${session.id}`
+                              `/UserPanel/ControllerDashboard/CounselingSessions/${session.id}/SubmitAttendanceLog`
                             );
                           }}
                         >
@@ -166,7 +182,7 @@ export default function MentorCounselingSessions() {
                           className="px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white text-sm font-medium rounded-md"
                           onClick={() =>
                             router.push(
-                              `/UserPanel/ControllerDashboard/SessionReport/${session.id}`
+                              `/UserPanel/ControllerDashboard/CounselingSessions/${session.id}/ReportAttendanceLog`
                             )
                           }
                         >

@@ -233,7 +233,7 @@ export default function PatientsApproved({ userId }: { userId: string }) {
                   {/* انتخاب گروه برای تأیید */}
                   <div className="flex flex-col gap-2">
                     <p className="text-xs font-semibold text-gray-700">
-                      گروه های مشاوره:
+                      گروه‌های مشاوره:
                     </p>
                     {isLoadingGroups ? (
                       <p className="text-gray-500 text-xs">
@@ -245,15 +245,15 @@ export default function PatientsApproved({ userId }: { userId: string }) {
                         required
                       >
                         {/* اضافه کردن کلاس‌های راست‌چین به SelectTrigger */}
-                        <SelectTrigger className="w-full text-right">
+                        <SelectTrigger className="w-full rtl text-right">
                           <SelectValue
                             placeholder="گروه را انتخاب کنید"
-                            className="text-right"
+                            className="text-right rtl"
                           />
                         </SelectTrigger>
 
                         {/* اضافه کردن کلاس‌های راست‌چین به SelectContent */}
-                        <SelectContent className="text-right">
+                        <SelectContent className="text-right rtl">
                           {groups?.map(
                             (group: {
                               id: string;
@@ -264,7 +264,7 @@ export default function PatientsApproved({ userId }: { userId: string }) {
                               <SelectItem
                                 key={group.id}
                                 value={group.id}
-                                className="text-right"
+                                className="text-right rtl"
                               >
                                 {group.description}
                               </SelectItem>

@@ -34,6 +34,14 @@ export default function TabController() {
     { value: "3", title: "رد‌شده" },
   ];
 
+  // بازیابی تب انتخاب‌شده از localStorage در بارگذاری اولیه
+  useEffect(() => {
+    const savedTab = localStorage.getItem("activeTab");
+    if (savedTab) {
+      setSelectedTab(savedTab); // تب فعال را تنظیم می‌کنیم
+    }
+  }, []);
+
   // دریافت لیست بیماران با فیلتر وضعیت
   const { data, isLoading, refetch } = useQuery({
     queryKey: ["PatientsList", selectedTab, page, search],
@@ -62,23 +70,25 @@ export default function TabController() {
     refetch();
   };
 
+  const handleTabChange = (tab: string) => {
+    setSelectedTab(tab);
+    setPage(1);
+    localStorage.setItem("activeTab", tab); // تب فعال را ذخیره می‌کنیم
+    refetch();
+  };
+
   const isZero = totalCount === 0; // بررسی خالی بودن لیست بیماران
 
   return (
     <div className="w-[95vw] lg:w-[82vw] xl:w-[70vw] 3xl:w-[65vw] mt-16 pt-9 mx-auto">
       {isMobile ? (
-        // نمایش در حالت موبایل
         <div>
           <Tabs value={selectedTab} className="" dir="rtl">
             {/* Dropdown برای وضعیت در موبایل */}
             <div className="flex flex-col-reverse items-center justify-between w-full gap-4 mb-5 lg:flex-row lg:gap-2">
               <Select
                 value={selectedTab}
-                onValueChange={(value) => {
-                  setSelectedTab(value);
-                  setPage(1);
-                  refetch();
-                }}
+                onValueChange={(value) => handleTabChange(value)}
               >
                 <SelectTrigger className="w-full h-12 bg-[#E9E9E9]" dir="rtl">
                   <SelectValue placeholder="انتخاب وضعیت" />
@@ -92,7 +102,6 @@ export default function TabController() {
                 </SelectContent>
               </Select>
 
-              {/* کامپوننت جستجو */}
               <Search
                 value={search}
                 changeValue={(data: any) => setSearch(data)}
@@ -102,7 +111,6 @@ export default function TabController() {
               />
             </div>
 
-            {/* محتوای وضعیت */}
             <TabsContent value={selectedTab}>
               {isLoading ? (
                 <div className="flex flex-col gap-3">
@@ -115,12 +123,9 @@ export default function TabController() {
                   data={data?.data || []}
                   currentPage={currentPage}
                   pageSize={pageSize}
-                  userRole="Admin" // Replace "someUserRole" with the actual user role value
-                  
+                  userRole="Admin"
                 />
               )}
-
-              {/* صفحه‌بندی */}
               {!isZero ? (
                 <Pagination
                   TotalPages={totalPages}
@@ -137,34 +142,26 @@ export default function TabController() {
           </Tabs>
         </div>
       ) : (
-        // نمایش در حالت دسکتاپ
         <div>
           <Tabs value={selectedTab} className="" dir="rtl">
-            {/* تب‌ها در دسکتاپ */}
             <div className="flex flex-col-reverse items-center justify-between w-full gap-4 mb-5 lg:flex-row lg:gap-2">
-              {/* تب‌ها در دسکتاپ */}
               <TabsList className="flex w-full gap-1 lg:w-4/5 p-1 bg-gray-100 rounded-md shadow-md max-lg:flex-wrap">
                 {userStatuses.map((item) => (
                   <TabsTrigger
                     key={item.value}
                     value={item.value}
-                    className={`flex-1 h-8 px-4 py-1 text-sm font-medium text-gray-700 transition-colors duration-200 border rounded-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
+                    className={`flex-1 h-8 px-4 py-1 text-sm font-medium ${
                       selectedTab === item.value
-                        ? "bg-blue-100 text-blue-700 border-blue-500"
-                        : "bg-white text-gray-700 border-gray-300"
+                        ? "bg-blue-100 text-blue-700"
+                        : "bg-white"
                     }`}
-                    onClick={() => {
-                      setSelectedTab(item.value);
-                      setPage(1);
-                      refetch();
-                    }}
+                    onClick={() => handleTabChange(item.value)}
                   >
                     {item.title}
                   </TabsTrigger>
                 ))}
               </TabsList>
 
-              {/* کامپوننت جستجو */}
               <Search
                 value={search}
                 changeValue={(data: any) => setSearch(data)}
@@ -174,7 +171,6 @@ export default function TabController() {
               />
             </div>
 
-            {/* محتوای وضعیت */}
             <TabsContent value={selectedTab}>
               {isLoading ? (
                 <div className="flex flex-col gap-3">
@@ -190,8 +186,6 @@ export default function TabController() {
                   userRole="Admin"
                 />
               )}
-
-              {/* صفحه‌بندی */}
               {!isZero ? (
                 <Pagination
                   TotalPages={totalPages}

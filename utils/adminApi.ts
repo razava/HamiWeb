@@ -354,6 +354,11 @@ export async function getSessionUsers(sessionId: string | null) {
   return data.data;
 }
 
+export const getSessionAttendanceLogs = async (sessionId: string) => {
+  const response = await axios.get(`/api/CounselingSession/attendance-logs/${sessionId}`);
+  return response.data;
+};
+
 export const submitAttendanceLogs = async (payload: {
    sessionId: string;
    attendanceLogs: any[] }) => {

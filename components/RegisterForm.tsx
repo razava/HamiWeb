@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
 import * as z from "zod";
@@ -43,7 +43,7 @@ const Step1Schema = z.object({
     .string()
     //.min(1, { message: "نام خانوادگی الزامی است." })
     .max(50, { message: "نام خانوادگی نمی‌تواند بیشتر از 50 کاراکتر باشد." }),
-  nickName: z
+  title: z
     .string()
     .min(1, { message: "نام مستعار الزامی است." })
     .max(50, { message: "نام مستعار نمی‌تواند بیشتر از 50 کاراکتر باشد." }),
@@ -52,13 +52,13 @@ const Step1Schema = z.object({
     required_error: "انتخاب جنسیت الزامی است.",
   }),
   dateOfBirth: z
-  .date({
-    required_error: "تاریخ تولد الزامی است.",
-    invalid_type_error: "لطفاً یک تاریخ معتبر وارد کنید.",
-  })
-  .refine((value) => value instanceof Date && !isNaN(value.getTime()), {
-    message: "تاریخ تولد نامعتبر است.",
-  }),
+    .date({
+      required_error: "تاریخ تولد الزامی است.",
+      invalid_type_error: "لطفاً یک تاریخ معتبر وارد کنید.",
+    })
+    .refine((value) => value instanceof Date && !isNaN(value.getTime()), {
+      message: "تاریخ تولد نامعتبر است.",
+    }),
   education: z.enum(["0", "1", "2", "3", "4", "5"]).optional(), // اختیاری کردن فیلد
   city: z
     .string()
@@ -88,15 +88,15 @@ const Step2Schema = z.object({
       message: "تشخیص پاتولوژی نمی‌تواند بیشتر از 200 کاراکتر باشد.",
     })
     .optional(), // تشخیص پاتولوژی (اختیاری)
-  initialWeight: z
+  initialWeight: z.coerce
     .number({ invalid_type_error: "وزن اولیه باید یک مقدار عددی باشد." })
     // .positive({ message: "وزن اولیه باید بزرگتر از صفر باشد." })
     // .max(300, { message: "وزن اولیه نمی‌تواند بیشتر از 300 کیلوگرم باشد." })
     .optional(), // وزن اولیه (اختیاری)
-  sleepDuration: z
+  sleepDuration: z.coerce
     .number({ invalid_type_error: "مدت خوابیدن باید یک مقدار عددی باشد." })
-    .positive({ message: "مدت خوابیدن باید بزرگتر از صفر باشد." })
-    .max(24, { message: "مدت خوابیدن نمی‌تواند بیشتر از 24 ساعت باشد." })
+    // .positive({ message: "مدت خوابیدن باید بزرگتر از صفر باشد." })
+    // .max(24, { message: "مدت خوابیدن نمی‌تواند بیشتر از 24 ساعت باشد." })
     .optional(), // مدت خوابیدن (اختیاری)
   appetiteLevel: z.enum(["1", "2", "3"], {
     required_error: "لطفاً میزان اشتها را انتخاب کنید.",
@@ -150,6 +150,9 @@ export default function PreRegister() {
   const [formData, setFormData] = useState<any>({}); // برای ذخیره داده‌ها
   const [gadData, setGadData] = useState<any>({}); // داده‌های GAD
   const [mddData, setMddData] = useState<any>({}); // داده‌های MDD
+  const [storedPhoneNumber, setStoredPhoneNumber] = useState<string | null>(
+    null
+  ); // ذخیره شماره از localStorage
 
   const formStep1 = useForm<z.infer<typeof Step1Schema>>({
     resolver: zodResolver(Step1Schema),
@@ -158,7 +161,7 @@ export default function PreRegister() {
       password: "", // مقدار پیش‌فرض خالی
       firstName: "",
       lastName: "",
-      nickName: "",
+      title: "",
       email: "",
       gender: undefined, // پیش‌فرض: انتخاب نشده
       dateOfBirth: undefined, // پیش‌فرض: انتخاب نشده
@@ -166,6 +169,15 @@ export default function PreRegister() {
       city: "",
     },
   });
+
+  // خواندن شماره تلفن از localStorage
+  useEffect(() => {
+    const phoneNumber = localStorage.getItem("RegisterPhone");
+    if (phoneNumber) {
+      setStoredPhoneNumber(phoneNumber); // ذخیره شماره تلفن در state
+      formStep1.setValue("phoneNumber", phoneNumber); // مقداردهی فیلد شماره تلفن
+    }
+  }, []);
 
   const formStep2 = useForm<z.infer<typeof Step2Schema>>({
     resolver: zodResolver(Step2Schema),
@@ -175,7 +187,7 @@ export default function PreRegister() {
       patientStatus: undefined,
       stage: "",
       pathologyDiagnosis: "",
-      initialWeight: 0,
+      initialWeight: undefined,
       sleepDuration: undefined,
       appetiteLevel: undefined,
     },
@@ -212,9 +224,12 @@ export default function PreRegister() {
   const registerMutation = useMutation({
     mutationFn: preRegisterPatient,
     onSuccess: (data) => {
-      toast("ثبت نام با موفقیت انجام شد. پس از تایید اطلاعات توسط اپراتور شما میتوانید به سامانه وارد شوید.", {
-        className: "!bg-green-500 !text-white",
-      });
+      toast(
+        "ثبت نام با موفقیت انجام شد. پس از تایید اطلاعات توسط اپراتور شما میتوانید به سامانه وارد شوید.",
+        {
+          className: "!bg-green-500 !text-white",
+        }
+      );
       router.push("/UserPanel/ControllerDashboard"); // هدایت به داشبورد پس از ثبت نام موفق
     },
     onError: (error) => {
@@ -253,6 +268,7 @@ export default function PreRegister() {
       nationalId: formData.nationalId || "",
       firstName: formData.firstName,
       lastName: formData.lastName,
+      title: formData.title,
       dateOfBirth: formData.dateOfBirth,
       gender: parseInt(formData.gender),
       education: formData.education ? parseInt(formData.education) : 0,
@@ -264,7 +280,7 @@ export default function PreRegister() {
       pathologyDiagnosis: formData.pathologyDiagnosis || "",
       initialWeight: formData.initialWeight
         ? parseFloat(formData.initialWeight)
-        : 0,
+        : undefined,
       sleepDuration: formData.sleepDuration
         ? parseFloat(formData.sleepDuration)
         : undefined,
@@ -340,14 +356,15 @@ export default function PreRegister() {
                     name="phoneNumber"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-xs text-blue dark:text-white text-right">
-                          شماره همراه <span className="text-red-500">*</span>
+                        <FormLabel className="text-sm text-blue-700">
+                          شماره همراه
                         </FormLabel>
                         <FormControl>
                           <Input
                             {...field}
-                            placeholder="شماره همراه خود را وارد نمایید"
-                            type="tel"
+                            disabled={true} // غیرفعال کردن فیلد
+                            placeholder="شماره همراه"
+                            className="cursor-not-allowed"
                           />
                         </FormControl>
                         <FormMessage />
@@ -414,7 +431,7 @@ export default function PreRegister() {
                   />
                   <FormField
                     control={formStep1.control}
-                    name="nickName"
+                    name="title"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-xs text-blue dark:text-white text-right">
@@ -502,7 +519,11 @@ export default function PreRegister() {
                             containerClassName="w-full"
                             inputClass="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white" // استایل ورودی
                             value={field.value || null} // مقدار پیش‌فرض
-                            onChange={(date) => field.onChange(date?.isValid ? date.toDate() : null)} // تبدیل به مقدار تاریخ میلادی
+                            onChange={(date) =>
+                              field.onChange(
+                                date?.isValid ? date.toDate() : null
+                              )
+                            } // تبدیل به مقدار تاریخ میلادی
                           />
                         </FormControl>
                         <FormMessage />

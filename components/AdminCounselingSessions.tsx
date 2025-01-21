@@ -45,6 +45,7 @@ const defaultSessionValues = {
   patientGroupId: "",
   mentorId: "",
   scheduledDate: "",
+  scheduledTime: "", // اضافه‌شده: زمان جلسه
   topic: "",
   meetingLink: "",
   mentorNote: "",
@@ -139,6 +140,7 @@ export default function AdminCounselingSessions() {
     setSessionForm({
       ...session,
       scheduledDate: moment(session.scheduledDate).format("jYYYY/jMM/jDD"),
+      scheduledTime: moment(session.scheduledDate).format("HH:mm"),
     });
     setIsDialogOpen(true);
   };
@@ -150,19 +152,26 @@ export default function AdminCounselingSessions() {
 
   // ارسال فرم
   const handleSubmit = () => {
+    debugger;
+    // فرض کنید تاریخ و زمان از فرم گرفته شده‌اند:
+    const jalaliDate = sessionForm.scheduledDate; // تاریخ شمسی (مثل: 1403/11/17)
+    const selectedTime = sessionForm.scheduledTime; // زمان (مثل: 11:28)
+    // ترکیب تاریخ شمسی و زمان
+    const fullJalaliDateTime = `${jalaliDate} ${selectedTime}`;
+
+    // تبدیل تاریخ و زمان شمسی به میلادی
+    const gregorianDateTime = moment
+      .from(fullJalaliDateTime, "jYYYY/jMM/jDD HH:mm")
+      .format("YYYY-MM-DD HH:mm"); // تبدیل به شیء Date میلادی
+
     const formData = new FormData();
     formData.append("patientGroupId", sessionForm.patientGroupId);
     formData.append("mentorId", sessionForm.mentorId);
-    formData.append(
-      "scheduledDate",
-      moment
-        .from(sessionForm.scheduledDate, "jYYYY/jMM/jDD")
-        .format("YYYY-MM-DD")
-    );
+    formData.append("scheduledDate", gregorianDateTime);
     formData.append("topic", sessionForm.topic);
     formData.append("meetingLink", sessionForm.meetingLink);
     formData.append("mentorNote", sessionForm.mentorNote);
-
+    
     if (editingSession) {
       updateSessionMutation.mutate({
         id: editingSession.id,
@@ -170,6 +179,20 @@ export default function AdminCounselingSessions() {
       });
     } else {
       addSessionMutation.mutate(formData);
+    }
+  };
+
+  // محاسبه وضعیت جلسه
+  const getSessionStatus = (isConfirmed: boolean, scheduledDate: string) => {
+    const now = new Date();
+    const sessionDate = new Date(scheduledDate);
+
+    if (isConfirmed) {
+      return "برگزار شده";
+    } else if (sessionDate < now) {
+      return "منقضی شده";
+    } else {
+      return "برگزار نشده";
     }
   };
 
@@ -225,60 +248,19 @@ export default function AdminCounselingSessions() {
                     ))}
                   </select>
                 </div>
-                {/* شناسه منتور */}
-                <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    منتور:
-                  </label>
-                  <select
-                    className="w-full p-2 border rounded-md"
-                    value={sessionForm.mentorId || ""}
-                    onChange={(e) =>
-                      setSessionForm({
-                        ...sessionForm,
-                        mentorId: e.target.value,
-                      })
-                    }
-                  >
-                    <option value="">انتخاب منتور</option>
-                    {mentorsList?.data?.map((mentor: any) => (
-                      <option key={mentor.id} value={mentor.id}>
-                        {mentor.firstName} {mentor.lastName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                {/* <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    شناسه منتور:
-                  </label>
-                  <Input
-                    value={sessionForm.mentorId}
-                    onChange={(e) =>
-                      setSessionForm({
-                        ...sessionForm,
-                        mentorId: e.target.value,
-                      })
-                    }
-                    placeholder="شناسه منتور را وارد کنید"
-                  />
-                </div> */}
+
                 {/* تاریخ جلسه */}
                 <div>
                   <label className="text-sm font-medium text-gray-700">
                     تاریخ جلسه:
                   </label>
                   <DatePicker
-                    calendar={persian} // تقویم شمسی
-                    locale={persian_fa} // زبان فارسی
+                    calendar={persian}
+                    locale={persian_fa}
                     className="w-full p-2 border border-blue/30 rounded-md text-sm"
                     containerClassName="w-full"
-                    inputClass="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 border-gray-300 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                    value={
-                      sessionForm.scheduledDate
-                        ? sessionForm.scheduledDate
-                        : null
-                    } // مقدار پیش‌فرض
+                    inputClass="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 border-gray-300"
+                    value={sessionForm.scheduledDate || null}
                     onChange={(date) =>
                       setSessionForm({
                         ...sessionForm,
@@ -289,6 +271,27 @@ export default function AdminCounselingSessions() {
                     }
                   />
                 </div>
+
+                {/* زمان جلسه */}
+                <div>
+                  <label className="text-sm font-medium text-gray-700">
+                    زمان جلسه:
+                  </label>
+                  <Input
+                    type="time"
+                    value={sessionForm.scheduledTime || ""}
+                    onChange={(e) =>
+                      setSessionForm({
+                        ...sessionForm,
+                        scheduledTime: e.target.value,
+                      })
+                    }
+                    placeholder="مثال: 14:30"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md text-right text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500" // استایل راست‌چین
+                    dir="rtl" // راست‌چین کردن متن
+                  />
+                </div>
+
                 {/* موضوع */}
                 <div>
                   <label className="text-sm font-medium text-gray-700">
@@ -321,22 +324,6 @@ export default function AdminCounselingSessions() {
                     placeholder="لینک جلسه را وارد کنید"
                   />
                 </div>
-                {/* یادداشت منتور */}
-                {/* <div>
-                  <label className="text-sm font-medium text-gray-700">
-                    یادداشت منتور:
-                  </label>
-                  <Input
-                    value={sessionForm.mentorNote}
-                    onChange={(e) =>
-                      setSessionForm({
-                        ...sessionForm,
-                        mentorNote: e.target.value,
-                      })
-                    }
-                    placeholder="یادداشت منتور را وارد کنید"
-                  />
-                </div> */}
               </div>
               <DialogFooter>
                 <Button
@@ -371,13 +358,14 @@ export default function AdminCounselingSessions() {
                 <TableHead>تاریخ جلسه</TableHead>
                 <TableHead>موضوع</TableHead>
                 <TableHead>لینک جلسه</TableHead>
+                <TableHead>وضعیت</TableHead> {/* ستون وضعیت */}
                 <TableHead>عملیات</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {isSessionLoading ? (
                 <TableRow>
-                  <TableCell colSpan={7}>
+                  <TableCell colSpan={8}>
                     <div className="flex justify-center">
                       <Triangle
                         height="80"
@@ -395,20 +383,39 @@ export default function AdminCounselingSessions() {
                     <TableCell>{pageSize * (page - 1) + (index + 1)}</TableCell>
                     <TableCell>{session.patientGroupName}</TableCell>
                     <TableCell>{session.mentorName}</TableCell>
-                    <TableCell>{convertDate(session.scheduledDate)}</TableCell>
+                    <TableCell>
+                      {convertDate(session.scheduledDate)}{" "}
+                      {moment(session.scheduledDate).format("HH:mm")}
+                    </TableCell>
                     <TableCell>{session.topic}</TableCell>
                     <TableCell>{session.meetingLink}</TableCell>
                     <TableCell>
+                      {getSessionStatus(
+                        session.isConfirmed,
+                        session.scheduledDate
+                      )}
+                    </TableCell>
+                    <TableCell>
                       <div className="flex justify-center space-x-2 rtl:space-x-reverse">
+                        {/* ویرایش */}
                         <button
                           className="p-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
                           onClick={() => handleEditSession(session)}
+                          disabled={
+                            session.isConfirmed ||
+                            new Date(session.scheduledDate) < new Date()
+                          }
                         >
                           <Pencil className="w-4 h-4" />
                         </button>
+                        {/* حذف */}
                         <button
                           className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600"
                           onClick={() => handleDeleteSession(session.id)}
+                          disabled={
+                            session.isConfirmed ||
+                            new Date(session.scheduledDate) < new Date()
+                          }
                         >
                           <Trash className="w-4 h-4" />
                         </button>
