@@ -23,6 +23,13 @@ import { useRouter } from "next/navigation";
 import { Oval } from "react-loader-spinner";
 import { toast } from "sonner";
 
+// مرحله انتخاب نوع کاربر
+const Step0Schema = z.object({
+  roleType: z.enum(["1", "2"], {
+    required_error: "انتخاب نوع نقش الزامی است.",
+  }),
+});
+
 // تعریف الگوی اعتبارسنجی با Zod برای مرحله 1
 const Step1Schema = z.object({
   phoneNumber: z
@@ -59,6 +66,7 @@ const Step1Schema = z.object({
     .refine((value) => value instanceof Date && !isNaN(value.getTime()), {
       message: "تاریخ تولد نامعتبر است.",
     }),
+  isSmoker: z.boolean().default(false), // ✅ اضافه شدن فیلد سیگاری بودن
   education: z.enum(["0", "1", "2", "3", "4", "5"]).optional(), // اختیاری کردن فیلد
   city: z
     .string()
@@ -154,6 +162,13 @@ export default function PreRegister() {
     null
   ); // ذخیره شماره از localStorage
 
+  const [isCaregiver, setIsCaregiver] = useState(false); // آیا مراقب بیمار است؟
+
+  const formStep0 = useForm<z.infer<typeof Step0Schema>>({
+    resolver: zodResolver(Step0Schema),
+    defaultValues: { roleType: undefined },
+  });
+
   const formStep1 = useForm<z.infer<typeof Step1Schema>>({
     resolver: zodResolver(Step1Schema),
     defaultValues: {
@@ -165,6 +180,7 @@ export default function PreRegister() {
       email: "",
       gender: undefined, // پیش‌فرض: انتخاب نشده
       dateOfBirth: undefined, // پیش‌فرض: انتخاب نشده
+      isSmoker: false,
       education: undefined, // پیش‌فرض: انتخاب نشده
       city: "",
     },
@@ -239,6 +255,14 @@ export default function PreRegister() {
     },
   });
 
+  const onSubmitStep0 = (data: z.infer<typeof Step0Schema>) => {
+    if (Number(data.roleType) === 1) setIsCaregiver(false);
+    else setIsCaregiver(true);
+
+    setFormData({ ...formData, ...data });
+    setCurrentStep(1);
+  };
+
   const onSubmitStep1 = (data: z.infer<typeof Step1Schema>) => {
     setFormData({ ...formData, ...data });
     setCurrentStep(2); // رفتن به مرحله 2
@@ -271,6 +295,8 @@ export default function PreRegister() {
       title: formData.title,
       dateOfBirth: formData.dateOfBirth,
       gender: parseInt(formData.gender),
+      roleType: parseInt(formData.roleType),
+      isSmoker: formData.isSmoker,
       education: formData.education ? parseInt(formData.education) : 0,
       city: formData.city,
       organ: parseInt(formData.organ),
@@ -325,8 +351,10 @@ export default function PreRegister() {
           لطفا اطلاعات خود را تکمیل نمایید
         </p> */}
           <p className="text-lg font-semibold text-center text-blue dark:text-white">
-            {currentStep === 1
-              ? "لطفا اطلاعات شخصی خود را تکمیل کنید"
+            {currentStep === 0
+              ? "لطفا نوع نقش خود را انتخاب کنید. در صورتی که مراقب بیمار هستید اطلاعات هویتی خود را وارد نمایید و اطلاعات مربوط به بیماری و همچنین تاریخ تولد و سیگاری بودن را از بیمار مورد نظر خود وارد نمایید."
+              : currentStep === 1
+              ? "لطفا اطلاعات شخصی را تکمیل کنید"
               : currentStep === 2
               ? "هر چه اطلاعات دقیق تری را با ما به اشتراک بگذارید، بهتر می توانیم به شما کمک کنیم"
               : currentStep === 3
@@ -334,10 +362,12 @@ export default function PreRegister() {
               : "در طی دو هفته گذشته، چه میزان مشکلات (موارد) زیر برای شما آزار دهنده بوده است؟ (برای شما اتفاق افتاده است)"}
           </p>
 
-          <Form {...formStep1}>
+          <Form {...formStep0}>
             <form
               onSubmit={
-                currentStep === 1
+                currentStep === 0
+                  ? formStep0.handleSubmit(onSubmitStep0)
+                  : currentStep === 1
                   ? formStep1.handleSubmit(onSubmitStep1)
                   : currentStep === 2
                   ? formStep2.handleSubmit(onSubmitStep2)
@@ -347,6 +377,35 @@ export default function PreRegister() {
               }
               className="space-y-5"
             >
+              {/* مرحله انتخاب نوع کاربر */}
+              {currentStep === 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FormField
+                    control={formStep0.control}
+                    name="roleType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-xs text-blue dark:text-white text-right">
+                          لطفا نوع نقش خود را انتخاب کنید.{" "}
+                          <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <select
+                            {...field}
+                            className="w-full p-2 border border-blue/30 rounded-md text-sm"
+                          >
+                            <option value="">انتخاب کنید</option>
+                            <option value="1">خودم بیمار هستم</option>
+                            <option value="2">مراقب بیمار هستم</option>
+                          </select>
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              )}
+
               {/* مرحله 1 */}
               {currentStep === 1 && (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -357,7 +416,7 @@ export default function PreRegister() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-sm text-blue-700">
-                          شماره همراه
+                          {isCaregiver ? "شماره همراه خود" : "شماره همراه"}
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -378,7 +437,9 @@ export default function PreRegister() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="text-xs text-blue dark:text-white text-right">
-                          رمز عبور <span className="text-red-500">*</span>
+                          {isCaregiver ? "  رمز عبور خود" : " رمز عبور  "}
+
+                          <span className="text-red-500">*</span>
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -570,6 +631,74 @@ export default function PreRegister() {
                             {...field}
                             placeholder="شهر محل سکونت خود را وارد نمایید"
                           />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={formStep1.control}
+                    name="isSmoker"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-sm font-medium text-gray-700 dark:text-white">
+                          آیا سیگاری هستید؟{" "}
+                          <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <div className="flex items-center gap-6 mt-2">
+                            {/* گزینه "بله" */}
+                            <label className="flex items-center cursor-pointer space-x-2">
+                              <input
+                                type="radio"
+                                value="true"
+                                checked={field.value === true}
+                                onChange={() => field.onChange(true)}
+                                className="hidden"
+                              />
+                              <div
+                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all
+              ${
+                field.value === true
+                  ? "border-indigo-500 bg-indigo-500"
+                  : "border-gray-400 hover:border-indigo-400"
+              }`}
+                              >
+                                {field.value === true && (
+                                  <div className="w-2.5 h-2.5 bg-white rounded-full"></div>
+                                )}
+                              </div>
+                              <span className="text-gray-700 dark:text-white text-sm">
+                                بله
+                              </span>
+                            </label>
+
+                            {/* گزینه "خیر" */}
+                            <label className="flex items-center cursor-pointer space-x-2">
+                              <input
+                                type="radio"
+                                value="false"
+                                checked={field.value === false}
+                                onChange={() => field.onChange(false)}
+                                className="hidden"
+                              />
+                              <div
+                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all
+              ${
+                field.value === false
+                  ? "border-indigo-500 bg-indigo-500"
+                  : "border-gray-400 hover:border-indigo-400"
+              }`}
+                              >
+                                {field.value === false && (
+                                  <div className="w-2.5 h-2.5 bg-white rounded-full"></div>
+                                )}
+                              </div>
+                              <span className="text-gray-700 dark:text-white text-sm">
+                                خیر
+                              </span>
+                            </label>
+                          </div>
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -885,7 +1014,7 @@ export default function PreRegister() {
 
               {/* دکمه‌ها */}
               <div className="flex justify-between mt-5">
-                {currentStep > 1 && (
+                {currentStep > 0 && (
                   <Button
                     type="button"
                     className="w-1/3 p-2 text-white transition bg-gray-500 hover:bg-gray-600 rounded-xl"

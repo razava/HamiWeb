@@ -163,6 +163,8 @@ export async function preRegisterPatient(payload: {
   appetiteLevel: number; // 1 = High, 2 = Normal, 3 = Low
   gadScore: number; // امتیاز GAD
   mddScore: number; // امتیاز MDD
+  roleType:number; //1=Patient, 2= Caregiver
+isSmoker:boolean;
 }) {
   const data = await axios.post("/api/Authenticate/RegisterPatient", payload, {
     headers: {

@@ -7,10 +7,8 @@ import { getInfoByUserId } from "@/utils/infoApi";
 import { Triangle } from "react-loader-spinner"; // لودینگ
 import { useRouter } from "next/navigation"; // مدیریت بازگشت
 import { Button } from "@/components/ui/button"; // دکمه بازگشت
-import MoodLineChart from "./MoodLineChart";
-import MoodPieChart from "./MoodPieChart";
 
-export default function PatientsMentalAssessment({
+export default function PatientsTestLabsReport({
   userId,
 }: {
   userId: string;
@@ -19,7 +17,7 @@ export default function PatientsMentalAssessment({
 
   const { data, isLoading } = useQuery({
     queryKey: ["Infos"],
-    queryFn: () => getInfoByUserId("5", userId),
+    queryFn: () => getInfoByUserId("7", userId),
     refetchOnWindowFocus: false,
   });
 
@@ -52,7 +50,7 @@ export default function PatientsMentalAssessment({
 
       {/* عنوان صفحه */}
       <h2 className="text-lg font-bold text-blue-900 text-center mb-2">
-        ارزیابی مود روزانه بیمار
+        ارزیابی آزمایش های بیمار
       </h2>
 
       {/* نمایش کارت‌ها و نمودارها */}
@@ -70,13 +68,11 @@ export default function PatientsMentalAssessment({
         <div className="bg-[#EFEFEF80] rounded-lg shadow-md overflow-x-auto">
           <div className="flex min-w-[768px]">
             {data?.charts.map((chart: any, index: number) => (
-              // <MoodLineChart
-              //   key={index}
-              //   chartTitle={chart.chartTitle}
-              //   chartData={chart.series}
-              // />
-
-              <LineChart chartData={chart.series} chartTitle="مود روزانه بیمار در یک ماه گذشته" />
+              <LineChart
+                key={index}
+                chartTitle={chart.chartTitle}
+                chartData={chart.series}
+              />
             ))}
           </div>
         </div>

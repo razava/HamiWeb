@@ -60,8 +60,8 @@ export default function LineChart({
       datalabels: {
         display: true,
         color: "black",
-        align: "end" as const, // مقدار صحیح برای align
-        anchor: "end" as const, // مقدار صحیح برای anchor
+        align: "end" as const,
+        anchor: "end" as const,
         font: { size: 10 },
         formatter: function (value: number, context: any) {
           const index = context.dataIndex;
@@ -73,16 +73,33 @@ export default function LineChart({
     },
   };
 
+  // 🎨 **پالت رنگی برای خطوط نمودار**
+  const colorPalette = [
+    "rgba(54, 162, 235, 1)",  // آبی روشن
+    "rgba(255, 206, 86, 1)",  // زرد
+    "rgba(75, 192, 192, 1)",  // سبز
+    "rgba(153, 102, 255, 1)", // بنفش
+    "rgba(255, 159, 64, 1)",  // نارنجی
+    "rgba(255, 99, 132, 1)",  // قرمز تیره
+
+  ];
+
   const data = {
     labels: ["", ...chartData[0].values.map((item) => item.title)], // اضافه کردن dummy label
-    datasets: chartData.map((serie, index) => ({
-      label: serie.title, // عنوان سری (GAD یا MDD)
-      data: [null, ...serie.values.map((item) => parseInt(item.value))], // اضافه کردن فضای خالی برای هماهنگ‌سازی با dummy label
-      backgroundColor: `rgba(${index * 200}, 100, 200, 0.5)`, // رنگ خط
-      borderColor: `rgba(${index * 200}, 100, 200, 1)`, // رنگ حاشیه
-      borderWidth: 2,
-      tension: 0.4, // خطوط نرم بین نقاط
-    })),
+    datasets: chartData.map((serie, index) => {
+      const color = colorPalette[index % colorPalette.length]; // تخصیص رنگ‌ها با استفاده از مدولوس
+      return {
+        label: serie.title, // عنوان سری (GAD یا MDD)
+        data: [null, ...serie.values.map((item) => parseInt(item.value))], // اضافه کردن فضای خالی برای هماهنگ‌سازی با dummy label
+        backgroundColor: color.replace(", 1)", ", 0.5)"), // رنگ پس‌زمینه با شفافیت
+        borderColor: color, // رنگ خط اصلی
+        borderWidth: 2,
+        tension: 0.4, // خطوط نرم بین نقاط
+        pointBackgroundColor: color, // رنگ نقاط
+        pointBorderColor: "#fff",
+        pointRadius: 5, // اندازه نقاط
+      };
+    }),
   };
 
   return (

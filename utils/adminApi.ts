@@ -370,6 +370,43 @@ export const submitAttendanceLogs = async (payload: {
   return data.data;
 }
 
+// .....PatientLabTests................................................
+// دریافت لیست آزمایش‌های کاربر
+export const getPatientLabTests = async () => {
+  const response = await axios.get("/api/PatientLabTest");
+  return response.data;
+};
+
+export async function GetAllPatientLabTests({
+  PageNumber = 1,
+  PageSize = 4
+}: {
+  PageNumber?: number;
+  PageSize?: number;
+}) {
+  const data = await axios.get("api/PatientLabTest", {
+    params: { PageNumber: PageNumber, PageSize: PageSize },
+  });
+  return data;
+}
+
+// افزودن آزمایش جدید
+export const SubmitPatientLabTest = async (data: {
+  testType: number;
+  testValue: number;
+  unit: string;
+}) => {
+  const response = await axios.post("/api/PatientLabTest", data);
+  return response.data;
+};
+
+// export async function SubmitPatientLabTest(payload: FormData) {
+//   const data = await axios.post("api/PatientLabTest", payload, {
+//     headers: { "Content-Type": "application/json" },
+//   });
+//   return data.data;
+// }
+
 // .....Categories................................................
 export async function GetAllCategories() {
   const data = await axios.get("api/ComplaintCategories");
