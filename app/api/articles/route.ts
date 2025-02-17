@@ -1,79 +1,70 @@
-import { NextResponse } from "next/server";
-import axios from "axios";
-
-// تابع برای ترجمه متن به فارسی با استفاده از API رایگان
-const translateText = async (text: string) => {
+export async function GET(req: Request) {
   try {
-    const response = await axios.get(
-      "https://api.mymemory.translated.net/get",
-      {
-        params: {
-          q: text,
-          langpair: "en|fa",
-        },
-      }
-    );
-    return response.data.responseData.translatedText || text;
-  } catch (error) {
-    console.error("❌ خطا در ترجمه:", error);
-    return text; // اگر ترجمه نشد، متن اصلی را برمی‌گردانیم
-  }
-};
+    // دریافت مقدار `groupId` از Query Params
+    const { searchParams } = new URL(req.url);
+    const groupIdSlug = searchParams.get("groupId");
 
-// تابع مخصوص متد GET
-export async function GET() {
-  try {
-    console.log("✅ API articles فراخوانی شد!");
-
-    // دریافت شناسه‌های مقالات از PubMed
-    const pubmedResponse = await axios.get(
-      "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi",
-      {
-        params: {
-          db: "pubmed",
-          term: "ovarian cancer",
-          retmode: "json",
-          retmax: 5, // دریافت ۵ مقاله
-        },
-      }
-    );
-
-    const articleIds = pubmedResponse.data.esearchresult?.idlist || [];
-    if (articleIds.length === 0) {
-      return NextResponse.json({ error: "مقاله‌ای یافت نشد." }, { status: 404 });
+    if (!groupIdSlug) {
+      console.log("🚨 مقدار groupId دریافت نشد!");
+      return new Response(
+        JSON.stringify({ message: "🚨 مقدار groupId ارسال نشده است!" }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
     }
 
-    console.log("🔹 شناسه‌های مقالات:", articleIds);
+    console.log(`🔍 جستجوی دسته‌بندی برای نامک: ${groupIdSlug}`);
 
-    // دریافت جزئیات مقالات
-    const detailsResponse = await axios.get(
-      "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi",
-      {
-        params: {
-          db: "pubmed",
-          id: articleIds.join(","),
-          retmode: "json",
-        },
-      }
+    // دریافت ID دسته‌بندی از وردپرس با استفاده از `slug`
+    const categoryResponse = await fetch(
+      `https://hamihealth.com/wp-json/wp/v2/categories?slug=${groupIdSlug}`
     );
 
-    // ترجمه عنوان مقالات
-    const articles = await Promise.all(
-      articleIds.map(async (id: string) => {
-        const title = detailsResponse.data.result[id]?.title || "بدون عنوان";
-        const translatedTitle = await translateText(title);
-        return {
-          id,
-          title,
-          translatedTitle,
-          link: `https://pubmed.ncbi.nlm.nih.gov/${id}/`,
-        };
-      })
+    if (!categoryResponse.ok) {
+      throw new Error(`🚨 خطا در دریافت دسته‌بندی - وضعیت: ${categoryResponse.status}`);
+    }
+
+    const categories = await categoryResponse.json();
+
+    if (categories.length === 0) {
+      console.log("🚨 دسته‌بندی یافت نشد!");
+      return new Response(
+        JSON.stringify({ message: "🚨 دسته‌بندی‌ای با این نامک یافت نشد!" }),
+        { status: 404, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    const categoryId = categories[0].id;
+    console.log(`✅ دسته‌بندی با ID: ${categoryId} پیدا شد!`);
+
+    // دریافت مقالات بر اساس ID دسته‌بندی
+    const articlesResponse = await fetch(
+      `https://hamihealth.com/wp-json/wp/v2/posts?categories=${categoryId}`
     );
 
-    return NextResponse.json({ articles });
+    if (!articlesResponse.ok) {
+      throw new Error("🚨 خطا در دریافت مقالات");
+    }
+
+    const articles = await articlesResponse.json();
+
+    const formattedArticles = articles.map((article: any) => ({
+      id: article.id,
+      originalTitle: article.title.rendered,
+      translatedTitle: article.title.rendered, // اگر نیاز به ترجمه باشد
+      link: article.link,
+    }));
+
+    console.log(`✅ تعداد مقالات دریافت شده: ${formattedArticles.length}`);
+
+    return new Response(JSON.stringify({ articles: formattedArticles }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
-    console.error("❌ خطا در دریافت مقالات:", error);
-    return NextResponse.json({ error: "مشکلی در دریافت داده‌ها رخ داد." }, { status: 500 });
+    console.error("❌ خطای سرور در route.ts:", error);
+    // return new Response(
+    //   JSON.stringify({ message: `🚨 خطای سرور: ${error.message}` }),
+    //   { status: 500, headers: { "Content-Type": "application/json" } }
+    // );
   }
 }

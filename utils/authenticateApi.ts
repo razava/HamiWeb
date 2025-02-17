@@ -77,6 +77,14 @@ export async function verifyStaff(payload: {
   return data.data;
 }
 
+// export async function logisterCitizen(payload: {
+//   phoneNumber: string;
+//   recaptchaToken: string; // ارسال توکن reCAPTCHA
+// }) {
+//   const data = await axios.post("api/Authenticate/LogisterCitizen", payload);
+//   return data.data;
+// }
+
 export async function logisterCitizen(payload: {
   phoneNumber: string;
   captcha: {

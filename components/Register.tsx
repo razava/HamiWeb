@@ -240,3 +240,107 @@ export default function Register() {
     </div>
   );
 }
+
+
+
+// "use client";
+
+// import React, { useState } from "react";
+// import { zodResolver } from "@hookform/resolvers/zod";
+// import { useForm } from "react-hook-form";
+// import * as z from "zod";
+// import { Button } from "@/components/ui/button";
+// import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+// import { Input } from "@/components/ui/input";
+// import Image from "next/image";
+// import LoginIcon from "../public/img/login-icon.svg";
+// import { useMutation } from "@tanstack/react-query";
+// import { logisterCitizen } from "@/utils/authenticateApi";
+// import { useRouter } from "next/navigation";
+// import { Oval } from "react-loader-spinner";
+// import { toast } from "sonner";
+// import ReCAPTCHA from "react-google-recaptcha";
+
+// // ✅ تعریف اعتبارسنجی فرم با Zod
+// const FormSchema = z.object({
+//   phoneNumber: z.string().min(1, { message: "لطفا شماره همراه را وارد نمایید." }),
+//   recaptcha: z.string().min(1, { message: "لطفا کپچا را تأیید کنید." }),
+// });
+
+// export default function Register() {
+//   const router = useRouter();
+//   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+
+//   const registerMutation = useMutation({
+//     mutationFn: logisterCitizen,
+//     onSuccess: () => {
+//       router.push("/RegisterForm");
+//       localStorage.setItem("RegisterPhone", form.getValues("phoneNumber"));
+//     },
+//     onError: (err: any) => {
+//       toast(<>{err.response?.data?.detail || "خطا در ارسال اطلاعات!"}</>, {
+//         className: "!bg-red-500 !text-white",
+//       });
+//     },
+//   });
+
+//   const form = useForm<z.infer<typeof FormSchema>>({
+//     resolver: zodResolver(FormSchema),
+//   });
+
+//   function onSubmit(data: z.infer<typeof FormSchema>) {
+//     console.log("Recaptcha Token:", recaptchaToken); // مقدار کپچا را در کنسول بررسی کنید
+  
+//     if (!recaptchaToken) {
+//       toast("لطفا کپچا را تأیید کنید!", { className: "!bg-red-500 !text-white" });
+//       return;
+//     }
+  
+//     const payload = {
+//       phoneNumber: data.phoneNumber,
+//       recaptchaToken,
+//     };
+  
+//     registerMutation.mutate(payload);
+//   }
+  
+
+//   return (
+//     <div className="grid w-screen h-screen bg-center bg-cover bg-no-repeat bg-[url('/img/login-pattern.png')] place-content-center">
+//       <div className="w-full sm:w-[20rem] md:w-[20rem] xl:w-[30rem] bg-white rounded-lg shadow-lg p-10">
+//         <Image alt="icon" src={LoginIcon} className="self-center w-1/3" />
+//         <p className="text-lg font-bold text-center text-blue-700">احراز هویت</p>
+
+//         <Form {...form}>
+//           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col space-y-4">
+//             <FormField
+//               control={form.control}
+//               name="phoneNumber"
+//               render={({ field }) => (
+//                 <FormItem>
+//                   <FormLabel>شماره همراه</FormLabel>
+//                   <FormControl>
+//                     <Input placeholder="شماره همراه خود را وارد نمایید" {...field} />
+//                   </FormControl>
+//                   <FormMessage />
+//                 </FormItem>
+//               )}
+//             />
+
+//             {/* ✅ Google reCAPTCHA */}
+//             <div className="flex justify-center">
+//               <ReCAPTCHA
+//                 sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+//                 onChange={(token) => setRecaptchaToken(token)}
+//               />
+//             </div>
+
+//             <Button type="submit" disabled={registerMutation.isPending} className="w-full">
+//               {registerMutation.isPending ? <Oval height="20" width="20" color="#fff" /> : "تایید"}
+//             </Button>
+//           </form>
+//         </Form>
+//       </div>
+//     </div>
+//   );
+// }

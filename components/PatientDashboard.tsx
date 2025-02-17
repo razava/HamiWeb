@@ -46,7 +46,7 @@ export default function PatientDashboard() {
 
   const { data: profileData, isLoading: isLoadingProfile } = useQuery({
     queryKey: ["Profile"],
-    queryFn: () => getProfile(),
+    queryFn: () => getProfile("Patient"),
     refetchOnWindowFocus: false,
   });
 
@@ -111,38 +111,50 @@ export default function PatientDashboard() {
     { value: 0, emoji: "😭", label: "خیلی بد" },
   ];
 
+  useEffect(() => {
+    // اطمینان از مقدارگیری کامل قبل از اجرای درخواست
+    debugger
+    if (profileData && profileData.patientGroupId) {
+      const fetchArticles = async () => {
+        try {
+          //console.log(`🔍 دریافت مقالات برای گروه: ${profileData.patientGroupId}`);
+          // const response = await fetch(`/api/articles?groupId=${profileData.patientGroupId}`);
+          const response = await fetch(`/api/articles?groupId=294e1f89-d9da-4760-9ece-7e8d8f312e04`);
+    
+          if (!response.ok) {
+            throw new Error("🚨 خطا در دریافت مقالات");
+          }
+    
+          const data = await response.json();
+          setArticles(data.articles);
+        } catch (error) {
+          console.error("❌ خطا در دریافت مقالات:", error);
+        }
+      };
+    
+      fetchArticles();
+    }
+  }, [profileData?.patientGroupId]); // وابسته به مقدار گروه کاربر
+  
+  
   // useEffect(() => {
   //   const fetchArticles = async () => {
   //     try {
-  //       const response = await axios.get(
-  //         "http://hamihealth.com/wp-json/wp/v2/posts?categories=5"
-  //       );
-  //       setArticles(response.data);
+  //       const response = await fetch("/api/articles", { method: "GET" });
+  //       if (!response.ok) {
+  //         throw new Error(`خطا در دریافت مقالات: ${response.status}`);
+  //       }
+  //       const data = await response.json();
+  //       setArticles(data.articles);
   //     } catch (error) {
-  //       console.error("Error fetching articles:", error);
+  //       console.error("❌ خطا در دریافت مقالات:", error);
+  //     } finally {
+  //       setLoading(false);
   //     }
   //   };
 
   //   fetchArticles();
   // }, []);
-  useEffect(() => {
-    const fetchArticles = async () => {
-      try {
-        const response = await fetch("/api/articles", { method: "GET" });
-        if (!response.ok) {
-          throw new Error(`خطا در دریافت مقالات: ${response.status}`);
-        }
-        const data = await response.json();
-        setArticles(data.articles);
-      } catch (error) {
-        console.error("❌ خطا در دریافت مقالات:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchArticles();
-  }, []);
 
 
   return (
