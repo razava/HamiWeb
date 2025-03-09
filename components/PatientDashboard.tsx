@@ -15,13 +15,14 @@ export default function PatientDashboard() {
   const [selectedMood, setSelectedMood] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   interface Article {
+    id: string;
     title: string;
     link: string;
   }
 
   //const [articles, setArticles] = useState<Article[]>([]);
   const [articles, setArticles] = useState<
-    { originalTitle: string; translatedTitle: string; link: string }[]
+    { id:string; originalTitle: string; translatedTitle: string; link: string }[]
   >([]);
 
   const [dailyQuote, setDailyQuote] = useState<string>("");
@@ -44,8 +45,8 @@ export default function PatientDashboard() {
     refetchOnWindowFocus: false,
   });
 
-  const { data: profileData, isLoading: isLoadingProfile } = useQuery({
-    queryKey: ["Profile"],
+  const { data: patientProfileData, isLoading: isLoadingProfile } = useQuery({
+    queryKey: ["PatientProfile"],
     queryFn: () => getProfile("Patient"),
     refetchOnWindowFocus: false,
   });
@@ -112,31 +113,66 @@ export default function PatientDashboard() {
   ];
 
   useEffect(() => {
-    // اطمینان از مقدارگیری کامل قبل از اجرای درخواست
     debugger
-    if (profileData && profileData.patientGroupId) {
+    if (patientProfileData && patientProfileData.organ) {
       const fetchArticles = async () => {
         try {
-          //console.log(`🔍 دریافت مقالات برای گروه: ${profileData.patientGroupId}`);
-          // const response = await fetch(`/api/articles?groupId=${profileData.patientGroupId}`);
-          const response = await fetch(`/api/articles?groupId=294e1f89-d9da-4760-9ece-7e8d8f312e04`);
-    
-          if (!response.ok) {
+          setLoading(true);
+      
+          // نامک (slug) گروه بیمار از پروفایل
+          const categorySlug = patientProfileData.organ;
+      
+          // مرحله 1: دریافت آیدی دسته‌بندی بر اساس slug
+          const categoryResponse = await fetch(
+            `https://hamihealth.com/wp-json/wp/v2/categories?slug=${categorySlug}`
+          );
+      
+          if (!categoryResponse.ok) {
+            throw new Error("🚨 خطا در دریافت آیدی دسته‌بندی");
+          }
+      
+          const categoryData = await categoryResponse.json();
+      
+          // بررسی اینکه دسته‌بندی پیدا شده یا نه
+          if (categoryData.length === 0) {
+            throw new Error("🚨 دسته‌بندی مورد نظر یافت نشد.");
+          }
+      
+          // گرفتن آیدی اولین دسته‌ای که با این نامک پیدا شده
+          const categoryId = categoryData[0].id;
+      
+          // مرحله 2: دریافت مقالات مربوط به این دسته‌بندی
+          const articlesResponse = await fetch(
+            `https://hamihealth.com/wp-json/wp/v2/posts?categories=${categoryId}`
+          );
+      
+          if (!articlesResponse.ok) {
             throw new Error("🚨 خطا در دریافت مقالات");
           }
-    
-          const data = await response.json();
-          setArticles(data.articles);
+      
+          const articlesData = await articlesResponse.json();
+      
+          // پردازش داده‌های دریافتی و ذخیره آن‌ها در state
+          const formattedArticles = articlesData.map((article: any) => ({
+            id: article.id,
+            originalTitle: article.title.rendered, // عنوان اصلی مقاله
+            translatedTitle: article.title.rendered, // اگر ترجمه داشته باشیم اینجا تغییر می‌کند
+            link: article.link, // لینک مقاله
+          }));
+      
+          setArticles(formattedArticles);
         } catch (error) {
           console.error("❌ خطا در دریافت مقالات:", error);
+        } finally {
+          setLoading(false);
         }
       };
-    
+      
       fetchArticles();
+      
     }
-  }, [profileData?.patientGroupId]); // وابسته به مقدار گروه کاربر
-  
-  
+  }, [patientProfileData?.patientGroupId]);
+
   // useEffect(() => {
   //   const fetchArticles = async () => {
   //     try {
@@ -156,7 +192,6 @@ export default function PatientDashboard() {
   //   fetchArticles();
   // }, []);
 
-
   return (
     <div className="w-[95vw] lg:w-[82vw] xl:w-[70vw] 3xl:w-[65vw] mx-auto mt-20 flex flex-col gap-8">
       {/* سطر اول: ثبت مود روزانه + جمله انگیزشی */}
@@ -164,7 +199,7 @@ export default function PatientDashboard() {
         {/* ستون ثبت مود */}
         <div className="flex-1 p-6 bg-white shadow-lg rounded-lg border border-gray-300">
           <h2 className="text-lg font-bold text-blue-900 mb-4">
-            خوش آمدی {profileData?.firstName} جان 🌿
+            خوش آمدی {patientProfileData?.firstName} جان 🌿
           </h2>
           <p className="text-sm text-gray-600 mb-6">حال شما امروز چطور است؟</p>
 
@@ -283,59 +318,42 @@ export default function PatientDashboard() {
 
       {/* سطر سوم: مقالات مرتبط */}
       <div className="bg-white shadow-lg rounded-lg border border-gray-300 p-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
-        📚 مقالات مرتبط   
-      </h2>
-        {loading ? (
-        <div className="space-y-4">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-16 bg-gray-200 animate-pulse rounded-md"></div>
-          ))}
-        </div>
-      ) : articles.length > 0 ? (
-        <ul className="space-y-4">
-          {articles.map((article: any) => (
-            <li
-              key={article.id}
-              className="p-4 bg-gray-100 rounded-md shadow-sm hover:bg-gray-200 transition duration-200"
-            >
-              <a
-                href={article.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-lg font-semibold text-blue-600 hover:text-blue-800 transition duration-200"
-              >
-                {article.translatedTitle}
-              </a>
-              <p className="text-gray-500 text-sm mt-1">({article.title})</p>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p className="text-gray-500 text-center">هیچ مقاله‌ای یافت نشد.</p>
-      )}
-
-        {/* <h2 className="text-lg font-bold text-blue-900 mb-4">
-          آخرین مقالات مرتبط
+        <h2 className="text-xl font-bold text-gray-800 mb-4 flex items-center">
+          📚 مقالات مرتبط
         </h2>
-        <ul className="list-disc pl-5">
-          {articles.length > 0 ? (
-            articles.map((article: any) => (
-              <li key={article.id} className="text-sm text-gray-700 mb-2">
+        {loading ? (
+          <div className="space-y-4">
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className="h-16 bg-gray-200 animate-pulse rounded-md"
+              ></div>
+            ))}
+          </div>
+        ) : articles.length > 0 ? (
+          <ul className="space-y-4">
+            {articles.map((article) => (
+              <li
+                key={article.id}
+                className="p-4 bg-gray-100 rounded-md shadow-sm hover:bg-gray-200 transition duration-200"
+              >
                 <a
                   href={article.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:underline"
+                  className="text-lg font-semibold text-blue-600 hover:text-blue-800 transition duration-200"
                 >
-                  {article.title.rendered}
+                  {article.translatedTitle}
                 </a>
+                <p className="text-gray-500 text-sm mt-1">
+                  ({article.originalTitle})
+                </p>
               </li>
-            ))
-          ) : (
-            <p className="text-sm text-gray-500">هیچ مقاله‌ای یافت نشد.</p>
-          )}
-        </ul> */}
+            ))}
+          </ul>
+        ) : (
+          <p className="text-gray-500 text-center">هیچ مقاله‌ای یافت نشد.</p>
+        )}
       </div>
     </div>
   );

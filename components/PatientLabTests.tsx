@@ -13,15 +13,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { convertFullTime } from "@/lib/utils";
-
-// تبدیل تاریخ میلادی به شمسی
-const convertDateToPersian = (dateString: string) => {
-  return new Date(dateString).toLocaleDateString("fa-IR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
-};
+import DatePicker from "react-multi-date-picker";
+import persian from "react-date-object/calendars/persian";
+import persian_fa from "react-date-object/locales/persian_fa";
+import moment from "jalali-moment";
 
 // لیست آزمایش‌های تومور مارکر
 const labTests = [
@@ -41,6 +36,7 @@ const getTestLabel = (testType: number) => {
 export default function PatientLabTests() {
   const [selectedTest, setSelectedTest] = useState<string | null>(null);
   const [testValue, setTestValue] = useState<string>("");
+  const [testDate, setTestDate] = useState<string>("");
 
   // دریافت لیست آزمایش‌های ثبت‌شده
   const {
@@ -56,8 +52,8 @@ export default function PatientLabTests() {
   // ثبت آزمایش جدید
   const mutation = useMutation({
     mutationFn: async () => {
-      if (!selectedTest || !testValue) {
-        throw new Error("لطفاً مقدار آزمایش را وارد کنید.");
+      if (!selectedTest || !testValue || !testDate) {
+        throw new Error("لطفاً تمام فیلدها را پر کنید.");
       }
 
       const test = labTests.find((t) => t.value === Number(selectedTest));
@@ -66,6 +62,7 @@ export default function PatientLabTests() {
       const testData = {
         testType: Number(selectedTest),
         testValue: parseFloat(testValue),
+        testDate, // ارسال تاریخ انجام آزمایش (شمسی)
         unit: test.unit,
       };
 
@@ -74,6 +71,7 @@ export default function PatientLabTests() {
     onSuccess: () => {
       toast.success("آزمایش با موفقیت ثبت شد!");
       setTestValue("");
+      setTestDate("");
       refetch();
     },
     onError: (error: any) => {
@@ -85,24 +83,22 @@ export default function PatientLabTests() {
     <div className="w-[95vw] lg:w-[82vw] xl:w-[70vw] mx-auto mt-12">
       {/* عنوان صفحه */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-bold text-blue-900">
-          آزمایش‌های پزشکی
-        </h2>
+        <h2 className="text-lg font-bold text-blue-900">آزمایش‌های پزشکی</h2>
       </div>
 
       {/* فرم ثبت آزمایش جدید */}
       <div className="mb-6 p-4 border rounded-lg shadow-md bg-white">
-        <h3 className="text-md font-semibold text-gray-800 mb-3">
+        <h3 className="text-md font-semibold text-gray-800 mb-3 text-right">
           ثبت آزمایش جدید
         </h3>
 
         {/* انتخاب نوع آزمایش */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 text-right">
             نوع آزمایش:
           </label>
           <Select onValueChange={(value) => setSelectedTest(value)}>
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full text-right">
               <SelectValue placeholder="انتخاب آزمایش" />
             </SelectTrigger>
             <SelectContent>
@@ -117,7 +113,7 @@ export default function PatientLabTests() {
 
         {/* مقدار آزمایش */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 text-right">
             جواب آزمایش:
           </label>
           <Input
@@ -125,6 +121,29 @@ export default function PatientLabTests() {
             value={testValue}
             onChange={(e) => setTestValue(e.target.value)}
             placeholder="عدد وارد کنید"
+            className="text-right"
+            dir="rtl"
+          />
+        </div>
+
+        {/* تاریخ انجام آزمایش (شمسی) */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 text-right">
+            تاریخ انجام آزمایش:
+          </label>
+          <DatePicker
+            calendar={persian}
+            locale={persian_fa}
+            className="w-full p-2 border border-blue/30 rounded-md text-sm text-right"
+            containerClassName="w-full"
+            inputClass="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 border-gray-300 text-right"
+            value={testDate || null}
+            onChange={(date) =>
+              setTestDate(
+                date ? moment(date.toDate()).format("jYYYY/jMM/jDD") : ""
+              )
+            }
+            //dir="rtl"
           />
         </div>
 
@@ -155,20 +174,20 @@ export default function PatientLabTests() {
               className="p-4 shadow-md rounded-lg border border-gray-300 bg-gray-100"
             >
               {/* عنوان آزمایش */}
-              <h3 className="text-md font-bold text-blue-800">
+              <h3 className="text-md font-bold text-blue-800 text-right">
                 {index + 1}. {getTestLabel(test.testType)}
               </h3>
 
               {/* مقدار آزمایش */}
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-sm text-gray-500 mt-2 text-right">
                 <span className="font-semibold text-gray-700">جواب: </span>
                 {test.testValue} {labTests.find((t) => t.value === test.testType)?.unit || ""}
               </p>
 
-              {/* تاریخ ثبت */}
-              <p className="text-sm text-gray-500 mt-2">
-                <span className="font-semibold text-gray-700">تاریخ: </span>
-                {convertFullTime(test.createdAt)}
+              {/* تاریخ انجام آزمایش */}
+              <p className="text-sm text-gray-500 mt-2 text-right">
+                <span className="font-semibold text-gray-700">تاریخ انجام آزمایش: </span>
+                {convertFullTime(test.testDate)}
               </p>
             </div>
           ))}
