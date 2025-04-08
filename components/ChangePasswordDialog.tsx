@@ -75,7 +75,7 @@ export default function ChangePasswordDialog({
       return;
     }
     ChangePasswordMutation.mutate({
-      oldPassword: data.oldPassword,
+      token: data.oldPassword,
       newPassword: data.newPassword,
     });
   }
