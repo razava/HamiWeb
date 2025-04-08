@@ -104,6 +104,43 @@ export async function verifyCitizen(payload: {
   return data.data;
 }
 
+export async function forgetPassword(payload: {
+  phoneNumber: string;
+  captcha: {
+    key: string;
+    value: string;
+  };
+}) {
+  const data = await axios.post("api/Authenticate/ForgotPassword", payload);
+  return data.data;
+}
+
+// ارسال کد تایید برای شماره موبایل
+export const verifyResetPasswordCode = async (payload: {
+  otpToken: string | null;
+  verificationCode: string;
+}) => {
+  const res = await fetch("/api/verify-reset-code", {
+    method: "POST",
+    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json" },
+  });
+
+  if (!res.ok) throw await res.json();
+  return await res.json(); // برمی‌گردونه: { token: "...", phoneNumber: "09..." }
+};
+
+// ثبت رمز عبور جدید
+export const submitNewPassword = async (payload: {
+  otpToken: string | null;
+  verificationCode: string;
+  newPassword: string;
+}) => {
+  const data = await axios.post("api/Authenticate/ResetPassword", payload);
+  return data.data;
+};
+
+
 export async function postChangePhoneNumber(payload: {
   newPhoneNumber: string;
   captcha: {
@@ -126,7 +163,7 @@ export async function putChangePhoneNumber(payload: {
 }
 
 export async function changePassword(payload: {
-  oldPassword: string;
+  token: string;
   newPassword: string;
 }) {
   const data = await axios.put("api/Authenticate/ChangePassword", payload);

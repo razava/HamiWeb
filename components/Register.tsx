@@ -56,7 +56,7 @@ export default function Register() {
     onSuccess: (res: any | string) => {
       localStorage.setItem("RegisterPhone",form.getValues("phoneNumber") );
       localStorage.removeItem("currentStep"); // پاک کردن مقدار قبلی
-      localStorage.setItem("currentStep", "3"); // تنظیم مقدار 0
+      localStorage.setItem("currentStep", "0"); // تنظیم مقدار 0
       router.push("/RegisterForm");
       
 
