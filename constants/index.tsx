@@ -14,7 +14,7 @@ export const menuItems = [
 
 export const operatorMenuItems = [
   { id: 1, name: "صفحه اصلی", href: "/" },
-  { id: 2, name: "مدیریت کاربران", href: "/" },
+  { id: 2, name: "مدیریت منتورها", href: "/" },
   { id: 3, name: "مدیریت گروه های درمانی", href: "/" },
   { id: 4, name: "مدیریت بیماری ها", href: "/CallUs" },
   { id: 5, name: "مدیریت پرسشنامه ها", href: "/" },
@@ -27,7 +27,7 @@ export const operatorMenuItems = [
 
 export const doctorMenuItems = [
   { id: 1, name: "صفحه اصلی", href: "/" },
-  { id: 2, name: "مدیریت کاربران", href: "/" },
+  { id: 2, name: "مدیریت منتورها", href: "/" },
   { id: 3, name: "مدیریت گروه های درمانی", href: "/" },
   { id: 4, name: "مدیریت بیماری ها", href: "/CallUs" },
   { id: 5, name: "مدیریت پرسشنامه ها", href: "/" },
@@ -177,7 +177,7 @@ export const ControllerMenuItems = [
 
 export const AdminMenuItems = [
   { id: 1, name: "پیشخوان", href: "/UserPanel/AdminDashboard" },
-  { id: 2, name: "مدیریت کاربران", href: "/UserPanel/AdminDashboard/UserManagement" },
+  { id: 2, name: "مدیریت منتورها", href: "/UserPanel/AdminDashboard/UserManagement" },
   {id: 3,name: "مدیریت بیماران",href: "/UserPanel/AdminDashboard/PatientManagement"},
   { id: 4, name: "مدیریت گروه ها", href: "/UserPanel/AdminDashboard/PatientGroups" },
   { id: 5, name: "مدیریت آزمون ها", href: "/UserPanel/AdminDashboard/TestPeriods" },

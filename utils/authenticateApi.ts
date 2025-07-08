@@ -187,6 +187,37 @@ export async function editProfile(payload: {
   return data.data;
 }
 
+export async function addMentor(payload: {
+  phoneNumber: string;
+  username: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  // dateOfBirth: Date;
+  email: string,
+  gender: number;
+  education: number;
+  city: string;
+  title?: string;
+}) {
+  const data = await axios.put("/api/Authenticate/CreateMentor", payload);
+  return data.data;
+}
+
+export async function editMentor(payload: {
+  firstName: string;
+  lastName: string;
+  // dateOfBirth: Date;
+  email: string,
+  gender: number;
+  education: number;
+  city: string;
+  title?: string;
+}) {
+  const data = await axios.put("/api/Authenticate/UpdateMentor", payload);
+  return data.data;
+}
+
 export async function preRegisterPatient(payload: {
   phoneNumber: string;
   username: string; // شماره همراه به عنوان نام کاربری

@@ -52,6 +52,37 @@ export async function getMentorsList({
   return data;
 }
 
+export async function GetSingleUser(id: string) {
+  const data = await axios.get(`api/Admin/users/${id}`);
+  return data.data;
+}
+
+export async function SubmitUser(payload: FormData) {
+  const data = await axios.post("api/User", payload, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data.data;
+}
+
+export async function UpdateUser({
+  id,
+  payload,
+}: {
+  id: string;
+  payload: FormData;
+}) {
+  const data = await axios.put(`api/User/${id}`, payload, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data.data;
+}
+
+export async function DeleteUser({ id }: { id: string }) {
+  const data = await axios.delete(`api/User/${id}`);
+  return data.data;
+}
+
+
 export async function getSessionReportByUserId(userId: string) {
   const response = await axios.post(`/api/Admin/SessionReport`, userId, {
     headers: {
