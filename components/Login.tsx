@@ -30,7 +30,7 @@ import { errorMessages } from "@/constants";
 import { RefreshCcw } from "lucide-react";
 const FormSchema = z.object({
   username: z.string().min(1, {
-    message: "لطفا نام کاربری را وارد نمایید.",
+    message: "لطفا نام کاربری (شماره همراه) را وارد نمایید.",
   }),
   password: z
     .string({ required_error: "لطفا رمز عبور را وارد نمایید." })
@@ -124,7 +124,7 @@ export default function Login() {
                     <FormControl>
                       <Input
                         className="mb-4"
-                        placeholder="نام کاربری خود را وارد نمایید"
+                        placeholder="نام کاربری(شماره همراه) خود را وارد نمایید"
                         {...field}
                       />
                     </FormControl>
