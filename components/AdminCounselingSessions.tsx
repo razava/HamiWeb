@@ -159,10 +159,17 @@ export default function AdminCounselingSessions() {
     // ترکیب تاریخ شمسی و زمان
     const fullJalaliDateTime = `${jalaliDate} ${selectedTime}`;
 
+    debugger
     // تبدیل تاریخ و زمان شمسی به میلادی
-    const gregorianDateTime = moment
-      .from(fullJalaliDateTime, "jYYYY/jMM/jDD HH:mm")
-      .format("YYYY-MM-DD HH:mm"); // تبدیل به شیء Date میلادی
+    // const gregorianDateTime = moment
+    //   .from(fullJalaliDateTime, "jYYYY/jMM/jDD HH:mm")
+    //   .format("YYYY-MM-DD HH:mm"); // تبدیل به شیء Date میلادی
+    // const gregorianDateTime = moment
+    // .from(fullJalaliDateTime, "jYYYY/jMM/jDD HH:mm")
+    // .format("YYYY-MM-DDTHH:mm:ss"); // فرمت استاندارد ISO8601
+
+   let gregorianDateTime = moment(fullJalaliDateTime, "jYYYY/jM/jD")
+       .format("YYYY-MM-DDTHH:mm:ss");
 
     const formData = new FormData();
     formData.append("patientGroupId", sessionForm.patientGroupId);

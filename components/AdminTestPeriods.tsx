@@ -158,13 +158,13 @@ export default function AdminTestPeriods() {
     formData.append("periodName", testPeriodForm.periodName);
     formData.append(
       "startDate",
-      moment
-        .from(testPeriodForm.startDate, "jYYYY/jMM/jDD")
-        .format("YYYY-MM-DD")
+      moment(testPeriodForm.startDate, "jYYYY/jMM/jDD")
+             .format("YYYY-MM-DD")
     );
     formData.append(
       "endDate",
-      moment.from(testPeriodForm.endDate, "jYYYY/jMM/jDD").format("YYYY-MM-DD")
+      moment(testPeriodForm.endDate, "jYYYY/jMM/jDD")
+             .format("YYYY-MM-DD")
     );
     formData.append("code", testPeriodForm.code);
 
