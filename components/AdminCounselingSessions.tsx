@@ -168,7 +168,7 @@ export default function AdminCounselingSessions() {
     // .from(fullJalaliDateTime, "jYYYY/jMM/jDD HH:mm")
     // .format("YYYY-MM-DDTHH:mm:ss"); // فرمت استاندارد ISO8601
 
-   let gregorianDateTime = moment(fullJalaliDateTime, "jYYYY/jM/jD")
+   let gregorianDateTime = moment(fullJalaliDateTime, "jYYYY/jMM/jDD HH:mm")
        .format("YYYY-MM-DDTHH:mm:ss");
 
     const formData = new FormData();
