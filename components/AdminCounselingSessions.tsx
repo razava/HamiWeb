@@ -419,10 +419,10 @@ export default function AdminCounselingSessions() {
                         <button
                           className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600"
                           onClick={() => handleDeleteSession(session.id)}
-                          disabled={
-                            session.isConfirmed ||
-                            new Date(session.scheduledDate) < new Date()
-                          }
+                          // disabled={
+                          //   session.isConfirmed ||
+                          //   new Date(session.scheduledDate) < new Date()
+                          // }
                         >
                           <Trash className="w-4 h-4" />
                         </button>
