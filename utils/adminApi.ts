@@ -104,9 +104,9 @@ export async function getTestPeriodsByUserId(userId: string) {
 //Patients.....................................................
 export async function getPatientsList({
   Status = 0,
+  UserName="",
   PageNumber = 1,
   PageSize = 10,
-  UserName=""
 }: {
   Status: number;
   UserName?: string;
@@ -114,7 +114,7 @@ export async function getPatientsList({
   PageSize?: number;
 }) {
   const data = await axios.get(`api/Admin/Patients`, {
-    params: {PageNumber, PageSize,Status },
+    params: {PageNumber, PageSize,Status,UserName },
   });
   return data;
 }

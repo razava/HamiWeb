@@ -12,6 +12,8 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import moment from "jalali-moment";
+
 
 ChartJS.register(
   CategoryScale,
@@ -86,7 +88,7 @@ export default function MoodLineChart({
 
   // آماده‌سازی داده‌ها برای نمودار
   const data = {
-    labels: chartData[0].values.map((item) => item.title), // تاریخ‌ها برای محور X
+    labels: chartData[0].values.map((item) => moment(item.title).format("jYYYY/jMM/jDD")), // تاریخ‌ها برای محور X
     datasets: chartData.map((serie, index) => ({
       label: serie.title, // عنوان سری
       data: serie.values.map((item) => item.value), // مقادیر

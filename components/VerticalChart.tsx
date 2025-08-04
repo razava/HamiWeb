@@ -18,6 +18,8 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import jalaliday from "jalaliday";
 import { backgroundColor, borderColor } from "@/constants/colors";
+import moment from "jalali-moment";
+
 dayjs.extend(jalaliday);
 dayjs.extend(utc);
 // import faker from "faker";
@@ -124,7 +126,7 @@ function BarChart({
 
   const data = {
     labels: chartData[0]?.values?.map((item) => {
-      return item.title;
+      return moment(item.title).format("jYYYY/jMM/jDD");
     }),
     datasets: chartData.map((item: any, index: number) => {
       return {

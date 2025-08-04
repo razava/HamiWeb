@@ -12,6 +12,8 @@ import {
 } from "chart.js";
 import { Line } from "react-chartjs-2";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import moment from "jalali-moment";
+
 
 ChartJS.register(
   CategoryScale,
@@ -85,7 +87,7 @@ export default function LineChart({
   ];
 
   const data = {
-    labels: ["", ...chartData[0].values.map((item) => item.title)], // اضافه کردن dummy label
+    labels: ["", ...chartData[0].values.map((item) => moment(item.title).format("jYYYY/jMM/jDD") )], // اضافه کردن dummy label
     datasets: chartData.map((serie, index) => {
       const color = colorPalette[index % colorPalette.length]; // تخصیص رنگ‌ها با استفاده از مدولوس
       return {
