@@ -402,12 +402,18 @@ export default function AdminTestPeriods() {
                         <button
                           className="p-2 bg-gray-500 text-white rounded-md hover:bg-gray-600"
                           onClick={() => handleEditTestPeriod(testPeriod)}
+                          disabled={
+                            new Date(testPeriod.endDate) < new Date()
+                          }
                         >
                           <Pencil className="w-4 h-4" />
                         </button>
                         <button
                           className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600"
                           onClick={() => handleDeleteTestPeriod(testPeriod.id)}
+                           disabled={
+                            new Date(testPeriod.endDate) < new Date()
+                          }
                         >
                           <Trash className="w-4 h-4" />
                         </button>
